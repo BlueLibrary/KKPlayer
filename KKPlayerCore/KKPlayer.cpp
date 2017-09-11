@@ -75,10 +75,10 @@ bool KKPlayer::GrabAvPicBGRA(void* buf,int len,int &w,int &h,bool keepscale)
 #ifdef Android_Plat
 void* kk_jni_attach_env();
 int kk_jni_detach_env();
-void  KKPlayer::SetSurfaceTexture(void* surface)
+void  KKPlayer::SetViewSurface(void* surface)
 {
-   m_pSurfaceTexture=surface;
-   LOGE_KK("SurfaceTexture= %d \n",(int)surface);  
+   m_pViewSurface=surface;
+   LOGE_KK("ViewSurface= %d \n",(int)surface);  
 }
 #endif
 std::list<KKPluginInfo>  KKPlayer::KKPluginInfoList;
@@ -126,7 +126,7 @@ KKPlayer::KKPlayer(IKKPlayUI* pPlayUI,IKKAudio* pSound):m_pSound(pSound),m_pPlay
 	
 #ifdef Android_Plat
 	m_pVideoRefreshJNIEnv=NULL;
-	m_pSurfaceTexture=0;
+	m_pViewSurface=0;
 #endif
 #ifdef PRINT_CODEC_INFO
 	AVInputFormat *ff=av_iformat_next(NULL);
@@ -1310,8 +1310,8 @@ int KKPlayer::OpenMedia(const char* URL,const char* Other)
 	pVideoInfo->IRender=m_pPlayUI->GetRender();
 
 	#ifndef _WINDOWS
-			pVideoInfo->SurfaceTexture=m_pSurfaceTexture;
-			LOGE_KK("pVideoInfo->SurfaceTexture= %d \n",(int)m_pSurfaceTexture); 
+			pVideoInfo->ViewSurface=m_pViewSurface;
+			LOGE_KK("pVideoInfo->ViewSurface= %d \n",(int)m_pViewSurface); 
     #endif
 	
     m_PktSerial=0;

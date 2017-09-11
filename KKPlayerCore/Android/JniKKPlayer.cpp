@@ -23,9 +23,9 @@ JNIEXPORT jint JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_IniKK(JNIEnv
 JNIEXPORT jint JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_IniGl(JNIEnv *env, jobject instance, jint player)
 {
     CAndKKPlayerUI *pKKUI = (CAndKKPlayerUI *)player;
-    jint texId=pKKUI->Init();
+    jint ret=pKKUI->Init();
 	pKKUI->SetSurfaceTexture(env);
-	return texId;
+	return ret;
 }
 
 JNIEXPORT void JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_SetDecoderMethod(JNIEnv *env, jobject instance, jint obj, jint method)
@@ -205,27 +205,56 @@ JNIEXPORT jint JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_GetkkMediaIn
 		if(strlen(info.AVRes)>0)
 		env->SetObjectField(jInfo, jfsAVRes, env->NewStringUTF(info.AVRes));
       
+	    /// 文件路径
         jfieldID jfsAvFile = env->GetFieldID(Infocls, "AvFile", "Ljava/lang/String;");
         if(info.AvFile!=NULL&&strlen(info.AvFile)>0)		
 		env->SetObjectField(jInfo, jfsAvFile, cToJstringutf(env,info.AvFile));
 	
-	    ///视频一些信息
-	    jfieldID jfsAVinfo = env->GetFieldID(Infocls, "AVinfo", "Ljava/lang/String;");
-	    if(strlen(info.AVinfo)>0)		
-		    env->SetObjectField(jInfo, jfsAVinfo, cToJstringutf(env, info.AVinfo));
+	    ///视频解码器名称
+	    jfieldID jfVideoCodecname = env->GetFieldID(Infocls, "VideoCodecname", "Ljava/lang/String;");
+        if(strlen(info.videoinfo.codecname)>0)		
+		env->SetObjectField(jInfo, jfVideoCodecname, cToJstringutf(env,info.videoinfo.codecname));
+	
+	    ///平均码率
+	    jfieldID jfVideoBitrate = env->GetFieldID(Infocls, "VideoBitrate", "I");		
+        env->SetIntField(jInfo, jfVideoBitrate, info.videoinfo.bitrate);		
 		
+        ///平均帧率
+	    jfieldID jfVideoFramerate = env->GetFieldID(Infocls, "VideoFramerate", "I");		
+        env->SetIntField(jInfo, jfVideoFramerate, info.videoinfo.framerate);	
+   
+   
+        ///音频解码器名称
+        jfieldID jfAudioCodecname = env->GetFieldID(Infocls, "AudioCodecname", "Ljava/lang/String;");
+        if(strlen(info.audioinfo.codecname)>0)		
+		env->SetObjectField(jInfo, jfAudioCodecname, cToJstringutf(env,info.audioinfo.codecname));
+	    
+		///音频采样率
+	    jfieldID jfAudioSample_rate = env->GetFieldID(Infocls, "AudioSample_rate", "I");		
+        env->SetIntField(jInfo, jfAudioSample_rate, info.audioinfo.sample_rate);	
+       
+	    ///声 道 数
+	    jfieldID jfAudioChannels = env->GetFieldID(Infocls, "AudioChannels", "I");		
+        env->SetIntField(jInfo, jfAudioChannels, info.audioinfo.channels);	
+        
+		
+		///文件大小
         jfieldID jfiFileSize = env->GetFieldID(Infocls, "FileSize", "I");		
         env->SetIntField(jInfo, jfiFileSize, info.FileSize);		
 		
+		///当前播放时间
 		jfieldID jfiCurTime = env->GetFieldID(Infocls, "CurTime", "I");	
 		env->SetIntField(jInfo, jfiCurTime, info.CurTime);
 		
+		///总时间
 		jfieldID jfiTotalTime = env->GetFieldID(Infocls, "TotalTime", "I");	
 		env->SetIntField(jInfo, jfiTotalTime, info.TotalTime); 
 		
+		///序列号
 		jfieldID jfiSerial = env->GetFieldID(Infocls, "Serial", "I");	
 		env->SetIntField(jInfo, jfiSerial, info.serial);
 		
+		///序列号1
 		jfieldID jfiSerial1 = env->GetFieldID(Infocls, "Serial1", "I");	
 		env->SetIntField(jInfo, jfiSerial1, info.serial1);
 		

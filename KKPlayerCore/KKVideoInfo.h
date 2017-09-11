@@ -382,7 +382,7 @@ typedef struct SKK_VideoState
 		HARD_CODE_MEDIACODEC = 4,
 	} Hard_Code;
 
-	void*   SurfaceTexture;///Android环境mediacodc 用
+	void*   ViewSurface;///Android环境mediacodc 用
 } SKK_VideoState;
 
 

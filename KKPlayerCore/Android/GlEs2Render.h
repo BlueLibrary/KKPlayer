@@ -15,12 +15,14 @@ class GlEs2Render: public IkkRender
 			/***
 			*是否保持长宽比例
 			*/
-			void  SetKeepRatio(int KeepRatio);
+			void     SetKeepRatio(int KeepRatio);
 			
 			jobject  SetSurfaceTexture(JNIEnv *env);
 			jobject  GetSurfaceTexture();
 			void     setFrameAvailable(bool const available);
 	private:
+	        ///生成一个Surface与SurfaceTexture绑定
+	        jobject  GenerateSurface();
             ///软解码用的	
 			GLuint buildProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
 			GLuint buildProgramSurfaceTexture(const char* vertexShaderSource, const char* fragmentShaderSource);
@@ -101,7 +103,8 @@ class GlEs2Render: public IkkRender
 		jmethodID updateTexImageMethodId;
 		jmethodID getTimestampMethodId;
 		jmethodID getTransformMtxId ;
-		jobject  javaSurfaceTextureObj;
+		jobject   javaSurfaceTextureObj;
+		jobject   javaViewSurfaceObj;
         JNIEnv   *m_penv;
 		bool     m_bfameAvailable;
 		int      m_bAvPicLoaded;

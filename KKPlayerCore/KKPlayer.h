@@ -109,7 +109,7 @@ class KKPlayer
 			{
 			    return m_pVideoRefreshJNIEnv;
 			}
-			void SetSurfaceTexture(void* surface) ;
+			void    SetViewSurface(void* surface) ;
 #endif
 
 private:
@@ -217,7 +217,7 @@ private:
 			double                             m_nOpenTime;
 #ifdef Android_Plat
 			void *  m_pVideoRefreshJNIEnv;
-			void*   m_pSurfaceTexture;
+			void*   m_pViewSurface;
 #endif
 			
 };

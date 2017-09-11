@@ -9,7 +9,8 @@ import android.widget.Button;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import android.graphics.SurfaceTexture;
-
+import android.media.MediaCodec;
+import android.view.Surface;
 import android.opengl.GLES10Ext; //GLES11Ext.GL_BLEND_EQUATION_RGB_OES;
 
 /**
@@ -19,9 +20,10 @@ import android.opengl.GLES10Ext; //GLES11Ext.GL_BLEND_EQUATION_RGB_OES;
 public class CKKPlayerGlRender implements GLSurfaceView.Renderer,SurfaceTexture.OnFrameAvailableListener
 {
 
-    private CJniKKPlayer  m_JniKKPlayer;
-    private int           m_nKKPlayer=0;
-    private SurfaceTexture  m_mediacodecSurfaceTexture=null;
+    private CJniKKPlayer          m_JniKKPlayer;
+    private int                   m_nKKPlayer=0;
+    private SurfaceTexture        m_mediacodecSurfaceTexture=null;
+   // private android.view.Surface  m_ViewSurface=null;
     private boolean      m_ReOpen=false;
     private CkkMediaInfo info= new CkkMediaInfo();
     private String m_url;
@@ -31,6 +33,7 @@ public class CKKPlayerGlRender implements GLSurfaceView.Renderer,SurfaceTexture.
     {
         m_JniKKPlayer = new CJniKKPlayer();
         m_nKKPlayer   = m_JniKKPlayer.IniKK(0);
+       // MediaCodec mcodec = new android.media.MediaCodec()
 
     }
     @Override
@@ -64,10 +67,14 @@ public class CKKPlayerGlRender implements GLSurfaceView.Renderer,SurfaceTexture.
             String glv = gl.glGetString(GL10.GL_VERSION);
             ///
             Log.v("Gl", "Gl Init");
-            int textHandleId = m_JniKKPlayer.IniGl(m_nKKPlayer);
+            ///初始化会，初始化一个全局的SurfaceTexture出来
+            m_JniKKPlayer.IniGl(m_nKKPlayer);
+            ///
             m_mediacodecSurfaceTexture= m_JniKKPlayer.GetSurfaceTexture( m_nKKPlayer);
             if( m_mediacodecSurfaceTexture!=null){
                 m_mediacodecSurfaceTexture.setOnFrameAvailableListener(this);
+                Log.v("Gl", "new Surface");
+                //m_ViewSurface = new Surface(m_mediacodecSurfaceTexture);
             }else{
                 Log.v("Gl", "m_mediacodecSurfaceTexture =0 ");
             }

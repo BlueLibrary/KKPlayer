@@ -54,6 +54,8 @@ JNIEXPORT jint JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_IniGl(JNIEnv
 *设置解码方式 0 默认解码， 1 mediacodec 解码
 **/
 JNIEXPORT void JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_SetDecoderMethod(JNIEnv *env, jobject instance, jint obj, jint method);
+
+///获取SurfaceTexture
 JNIEXPORT jobject JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_GetSurfaceTexture(JNIEnv * env, jobject instance, jint obj);
 
 JNIEXPORT void JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_OnSurfaceTextureFrameAailable(JNIEnv * env, jobject instance, jint obj);
@@ -114,9 +116,9 @@ JNIEXPORT jint JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_KKGetRealtim
 *设置最小延迟
 */
 JNIEXPORT jint JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_KKSetMinRealtimeDelay(JNIEnv *env, jobject instance,jint obj, jint value);
+
+///强制刷新播放器缓存队列
 JNIEXPORT void JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_KKForceFlushQue(JNIEnv *env, jobject instance,jint obj);
-
-
 
 /**
 * JNI 库模块加载事件处理接口。

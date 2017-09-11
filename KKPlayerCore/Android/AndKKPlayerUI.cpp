@@ -83,7 +83,7 @@ void CAndKKPlayerUI::SetSurfaceTexture(JNIEnv *env)
 	}
 	m_RenderLock.Unlock();
 
-	 LOGI(" SetSurfaceTexture obj= %d\n",obj);
+	LOGI(" SetSurfaceTexture obj= %d\n",obj);
 	m_player.SetSurfaceTexture(obj);
 }
 

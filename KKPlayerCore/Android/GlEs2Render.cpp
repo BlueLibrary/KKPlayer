@@ -139,6 +139,7 @@ GlEs2Render::GlEs2Render(KKPlayer* pPlayer):m_pGLHandle(0),gvPositionHandle(0),m
 ,getTransformMtxId(0)
 ,m_penv(0)
 ,javaSurfaceTextureObj(0)
+,javaViewSurfaceObj(0)
 ,m_bfameAvailable(false)
 ,g_glSurfaceProgram(0)
 ,m_vertexShaderSurfaceTexture(0)
@@ -188,6 +189,11 @@ GlEs2Render::~GlEs2Render()
 	 if (m_penv&&javaSurfaceTextureObj) {
         m_penv->DeleteGlobalRef( javaSurfaceTextureObj );
         javaSurfaceTextureObj = 0;
+		
+		if(javaViewSurfaceObj){
+			m_penv->DeleteGlobalRef(javaViewSurfaceObj);
+			javaViewSurfaceObj=0;
+		}
     }
 }
 void  GlEs2Render::SetKeepRatio(int KeepRatio)
@@ -197,7 +203,8 @@ void  GlEs2Render::SetKeepRatio(int KeepRatio)
 void GlEs2Render::GLES2_Renderer_reset()
 {
 	///gl view
-   
+	///软件使用的代码块
+	{
 			if (m_vertexShader) {
 				glDeleteShader(m_vertexShader);
 				m_vertexShader=0;
@@ -237,19 +244,24 @@ void GlEs2Render::GLES2_Renderer_reset()
 		if(g_SurfaceTextVId!=0)
 		    glDeleteTextures(1, &g_SurfaceTextVId);
 		m_bAvPicLoaded=0;
-   /*   glDeleteTextures(1, &m_textureParamHandle);
-	  m_textureParamHandle=0;
-		
-		glDeleteTextures(1, &m_texturepositionHandle);
-	  m_texturepositionHandle=0;
-     
-	 glDeleteTextures(1, &m_texturepositionHandle);
-	  m_texturepositionHandle=0;
-        GLuint m_textureCoordHandle;
-        GLuint m_textureTranformHandle;
-		
-			if(g_SurfaceTextVId!=0)
-				glDeleteTextures(1, &g_SurfaceTextVId);*/
+	}
+	
+	///硬件使用的代码块
+	{
+		  glDeleteTextures(1, &m_textureParamHandle);
+		  m_textureParamHandle=0;
+			
+		  glDeleteTextures(1, &m_texturepositionHandle);
+		  m_texturepositionHandle=0;
+		 
+		  glDeleteTextures(1, &m_texturepositionHandle);
+		  m_texturepositionHandle=0;
+		  GLuint m_textureCoordHandle;
+		  GLuint m_textureTranformHandle;
+			
+		  if(g_SurfaceTextVId!=0)
+			glDeleteTextures(1, &g_SurfaceTextVId);/**/
+	}
 }
 
 
@@ -363,75 +375,79 @@ int GlEs2Render::IniGl()
     printGLString("Extensions", GL_EXTENSIONS);
 
 
+	///软件使用的gl代码块
+	{
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+			glDisable(GL_DEPTH_TEST);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glDisable(GL_DEPTH_TEST);
+			g_glProgram = buildProgram(G_VERTEX_shader, g_FRAG_shader);
 
-    g_glProgram = buildProgram(G_VERTEX_shader, g_FRAG_shader);
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			glUseProgram(g_glProgram);
 
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glUseProgram(g_glProgram);
+			if( m_plane_textures[0]==NULL)
+			{
+				glGenTextures(1, &g_texYId);
+				glGenTextures(1, &g_texUId);
+				glGenTextures(1, &g_texVId);
+				
+			}
 
-    if( m_plane_textures[0]==NULL)
-    {
-        glGenTextures(1, &g_texYId);
-        glGenTextures(1, &g_texUId);
-        glGenTextures(1, &g_texVId);
-		
+
+			m_us2_sampler[0] = glGetUniformLocation(g_glProgram, "us2_SamplerX");
+			m_us2_sampler[1] = glGetUniformLocation(g_glProgram, "us2_SamplerY");
+			m_us2_sampler[2] = glGetUniformLocation(g_glProgram, "us2_SamplerZ");
+			GLuint um3_color_conversion = glGetUniformLocation(g_glProgram, "um3_ColorConversion");
+
+			m_plane_textures[0]=g_texYId;
+			m_plane_textures[1]=g_texUId;
+			m_plane_textures[2]=g_texVId;
+
+			for (int i = 0; i < 3; ++i) {
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(GL_TEXTURE_2D, m_plane_textures[i]);
+
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+				glUniform1i(m_us2_sampler[i], i);
+			}
+
+			
+
+
+			glUniformMatrix3fv(um3_color_conversion, 1, GL_FALSE, g_bt709);
+
+			g_av4_position = glGetAttribLocation(g_glProgram, "av4_Position");
+			g_av2_texcoord = glGetAttribLocation(g_glProgram, "av2_Texcoord");
+			GLuint  um4_mvp      = glGetUniformLocation(g_glProgram, "um4_ModelViewProjection");
+
+
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+			glDisable(GL_DEPTH_TEST);
+
+
+			KK_GLES_Matrix modelViewProj;
+			KK_GLES2_loadOrtho(&modelViewProj, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+			glUniformMatrix4fv(um4_mvp, 1, GL_FALSE, modelViewProj.m);
     }
-
-
-    m_us2_sampler[0] = glGetUniformLocation(g_glProgram, "us2_SamplerX");
-    m_us2_sampler[1] = glGetUniformLocation(g_glProgram, "us2_SamplerY");
-    m_us2_sampler[2] = glGetUniformLocation(g_glProgram, "us2_SamplerZ");
-    GLuint um3_color_conversion = glGetUniformLocation(g_glProgram, "um3_ColorConversion");
-
-    m_plane_textures[0]=g_texYId;
-    m_plane_textures[1]=g_texUId;
-    m_plane_textures[2]=g_texVId;
-
-    for (int i = 0; i < 3; ++i) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, m_plane_textures[i]);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        glUniform1i(m_us2_sampler[i], i);
-    }
-
-    
-
-
-    glUniformMatrix3fv(um3_color_conversion, 1, GL_FALSE, g_bt709);
-
-    g_av4_position = glGetAttribLocation(g_glProgram, "av4_Position");
-    g_av2_texcoord = glGetAttribLocation(g_glProgram, "av2_Texcoord");
-    GLuint  um4_mvp      = glGetUniformLocation(g_glProgram, "um4_ModelViewProjection");
-
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glDisable(GL_DEPTH_TEST);
-
-
-    KK_GLES_Matrix modelViewProj;
-    KK_GLES2_loadOrtho(&modelViewProj, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
-    glUniformMatrix4fv(um4_mvp, 1, GL_FALSE, modelViewProj.m);
-	
    //	glUseProgram(0);
-    ///surfacetexture 着色器
-	/*g_glSurfaceProgram=buildProgramSurfaceTexture(GSurfaceVertexShader, GSurfaceFragmentShader);
-	
-	m_textureParamHandle = glGetUniformLocation(g_glSurfaceProgram, "texture");
-    m_texturepositionHandle = glGetAttribLocation(g_glSurfaceProgram, "aPosition");
-    m_textureCoordHandle = glGetAttribLocation(g_glSurfaceProgram, "aTexCoordinate");
-    m_textureTranformHandle = glGetUniformLocation(g_glSurfaceProgram, "texTransform");*/
+    
+	///硬解使用的代码块
+	{
+		///surfacetexture 着色器
+		g_glSurfaceProgram=buildProgramSurfaceTexture(GSurfaceVertexShader, GSurfaceFragmentShader);
+		m_textureParamHandle = glGetUniformLocation(g_glSurfaceProgram, "texture");
+		m_texturepositionHandle = glGetAttribLocation(g_glSurfaceProgram, "aPosition");
+		m_textureCoordHandle = glGetAttribLocation(g_glSurfaceProgram, "aTexCoordinate");
+		m_textureTranformHandle = glGetUniformLocation(g_glSurfaceProgram, "texTransform");
+	}
    
     return m_pGLHandle;
 }
@@ -440,7 +456,32 @@ int GlEs2Render::IniGl()
 void GlEs2Render::setFrameAvailable(bool const available) {
     m_bfameAvailable = available;
 }
+jobject GlEs2Render::GenerateSurface()
+{
+	const char *stClassPath = "android/view/Surface";
+    const jclass ViewSurfaceClass = m_penv->FindClass(stClassPath);
+    if (ViewSurfaceClass == 0) {
+       LOGE("FindClass (%s) failed", stClassPath);
+    }
 
+    const jmethodID constructor = m_penv->GetMethodID( ViewSurfaceClass, "<init>", "(Landroid/graphics/SurfaceTexture;)V" );
+    if (constructor == 0) {
+      LOGE("GetMethonID(<init>) View/Surface failed");
+    }
+    jobject  obj = m_penv->NewObject(ViewSurfaceClass, constructor, javaSurfaceTextureObj);
+    if (obj == 0) {
+       LOGE("NewObject() View/Surface failed");
+    }
+	
+	javaViewSurfaceObj = m_penv->NewGlobalRef(obj);
+    if (javaViewSurfaceObj == 0) {
+       LOGE("NewGlobalRef() graphics/SurfaceTexture failed");
+    }
+
+    //Now that we have a globalRef, we can free the localRef
+    m_penv->DeleteLocalRef(obj);
+   
+}
 jobject GlEs2Render::SetSurfaceTexture(JNIEnv *env)
 {
 	m_penv=env;
@@ -460,17 +501,17 @@ jobject GlEs2Render::SetSurfaceTexture(JNIEnv *env)
 //    // find the constructor that takes an int
     const jmethodID constructor = env->GetMethodID( surfaceTextureClass, "<init>", "(I)V" );
     if (constructor == 0) {
-      LOGE("GetMethonID(<init>) failed");
+      LOGE("GetMethonID(<init>) graphics/SurfaceTexture failed");
     }
 
     jobject  obj = env->NewObject(surfaceTextureClass, constructor, g_SurfaceTextVId);
     if (obj == 0) {
-       LOGE("NewObject() failed");
+       LOGE("NewObject() graphics/SurfaceTexture failed");
     }
 
     javaSurfaceTextureObj = env->NewGlobalRef(obj);
     if (javaSurfaceTextureObj == 0) {
-       LOGE("NewGlobalRef() failed");
+       LOGE("NewGlobalRef() graphics/SurfaceTexture failed");
     }
 
     //Now that we have a globalRef, we can free the localRef
@@ -494,6 +535,7 @@ jobject GlEs2Render::SetSurfaceTexture(JNIEnv *env)
     // jclass objects are loacalRefs that need to be free;
     env->DeleteLocalRef( surfaceTextureClass );  /**/
 	
+	GenerateSurface();
 	return javaSurfaceTextureObj;
 }
 jobject  GlEs2Render::GetSurfaceTexture()
@@ -689,16 +731,10 @@ void GlEs2Render::render(kkAVPicInfo *Picinfo,bool wait)
 									 GL_UNSIGNED_BYTE,
 									 pixels[plane]);
 				        }
-						/*
-						 if (javaSurfaceTextureObj) {
-							 m_penv->CallVoidMethod(javaSurfaceTextureObj, updateTexImageMethodId);
-                        }*/
-   
-						
 	            }else{
-					  //glActiveTexture(GL_TEXTURE0) ;
-                      //glBindTexture(GL_TEXTURE_EXTERNAL_OES, g_SurfaceTextVId) ;
-					  //LOGI("MEDIACODEC  xxxxx \n");
+					  glActiveTexture(GL_TEXTURE0) ;
+                      glBindTexture(GL_TEXTURE_EXTERNAL_OES, g_SurfaceTextVId) ;
+					  LOGI("MEDIACODEC  render\n");
 				}
     }
 }

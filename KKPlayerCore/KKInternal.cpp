@@ -1000,15 +1000,15 @@ int stream_component_open(SKK_VideoState *is, int stream_index)
 					// avctx->get_format=mediacodec_GetFormat;
 				     AVMediaCodecContext *mc = av_mediacodec_alloc_context();
 
-					 mc->surface =is->SurfaceTexture;
+					 mc->surface =is->ViewSurface;
                     /* avctx->hwaccel_context = mc;*/
 
-                       int retx=av_mediacodec_default_init(avctx, mc,is->SurfaceTexture);
+                       int retx=av_mediacodec_default_init(avctx, mc,is->ViewSurface);
 					  if(retx==AVERROR_EXTERNAL)
-					   LOGE_KK("mediacodec SurfaceTexture err %d \n",(int)is->SurfaceTexture); 
+					   LOGE_KK("mediacodec ViewSurface err %d \n",(int)is->ViewSurface); 
 
-					   LOGE_KK("mediacodec SurfaceTexture %d \n",(int)is->SurfaceTexture); 
-					   LOGE_KK("mc SurfaceTexture %d \n",(int)mc->surface); 
+					   LOGE_KK("mediacodec ViewSurface %d \n",(int)is->ViewSurface); 
+					   LOGE_KK("mc ViewSurface %d \n",(int)mc->surface); 
 
 					   ///pix_fmt = ff_get_format(avctx, pix_fmts); 不知道为啥没有返回 AV_PIX_FMT_MEDIACODEC；，修改一下ffmpeg的源码看看，行不行。
 					   char abcd[64]="";
@@ -1034,7 +1034,7 @@ int stream_component_open(SKK_VideoState *is, int stream_index)
 
 	if (avctx->codec_type == AVMEDIA_TYPE_AUDIO)
             av_dict_set(&opts, "refcounted_frames", "1", 0);
-	else if(is->Hard_Code==SKK_VideoState::HARD_CODE_DXVA||(is->Hard_Code==SKK_VideoState::HARD_CODE_MEDIACODEC&&is->SurfaceTexture!=0)){
+	else if(is->Hard_Code==SKK_VideoState::HARD_CODE_DXVA||(is->Hard_Code==SKK_VideoState::HARD_CODE_MEDIACODEC&&is->ViewSurface!=0)){
 	       LOGE_KK("refcounted_frames  no %d \n",is->Hard_Code ); 
 	}else if (avctx->codec_type == AVMEDIA_TYPE_VIDEO){
 			av_dict_set(&opts, "refcounted_frames", "1", 0);
