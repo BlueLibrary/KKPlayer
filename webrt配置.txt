@@ -1,0 +1,36 @@
+I am using one Shadowsocks proxy in China because of the GFW.  
+The following is my complete setting :
+(1)  Set Shadowsockes as global proxy mode;
+
+(2)  Set GIT proxy as following:
+git config --global http.proxy http://localhost:1080
+git config --global https.proxy https://localhost:1080
+
+(3)  Set Winhttp proxy as following:
+c:\>netsh
+
+netsh>winhttp
+netsh winhttp>set proxy localhost:1080
+
+(4)  Set the http_proxy, https_proxy environment variables as following:
+c:\>set http_proxy=http://localhost:1080
+c:\>set https_proxy=https://localhost:1080
+
+在E:\depot_tools下新建http_proxy.boto，内容如下： 
+[Boto] 
+proxy= 127.0.0.1 
+proxy_port= 1080 
+
+set http_proxy=http://127.0.0.1:1080 
+set https_proxy=http://127.0.0.1:1080 
+设置下载工具git代理： 
+git config –global http.proxy http://127.0.0.1:1080 
+设置BOTO代理，解决download google storage失败问题： 
+set NO_AUTH_BOTO_CONFIG=E:\depot_tools\http_proxy.boto 
+设置不再次下载工具链： 
+set DEPOT_TOOLS_WIN_TOOLCHAIN=0 
+设置生成工程环境变量： 
+set GYP_GENERATORS=msvs-ninja,ninja 
+set GYP_MSVS_VERSION=2015 
+首次下载输入下载命令： 
+fetch webrtc 
