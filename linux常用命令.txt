@@ -15,3 +15,22 @@ ps -aux | grep turnserver
 # make install
 
 coturn配置http://blog.csdn.net/u012908515/article/details/54863661
+
+实现：
+有2种方法可以解决这个。
+1)在Windows下转换：
+利用一些编辑器如UltraEdit或EditPlus等工具先将脚本编码转换，再放到Linux中执行。转换方式如下(UltraEdit)：File–>Conversions–>DOS->UNIX即可。
+
+2)用vim打开该sh文件，输入：
+:set ff //回车，显示fileformat=dos
+:set ff=unix //重新设置下文件格式
+:wq //保存退出
+再执行，就不会再提示No such file or directory这个问题了。
+
+ yum list | grep apr
+ 
+ 先执行下面的命令，查看所有的已安装软件名称。
+rpm -qa 
+然后执行
+rpm -ql 软件名称
+就可以显示软件的安装路径。
