@@ -37,12 +37,14 @@ fetch webrtc
 下次更新
 gclient sync 
 
-
+$(WebrtcPath)\src\out\x86Re\lib;
 
 gn gen out/x862015  --ide="vs2015" --args="is_debug=true target_cpu=\"x86\""
 gn gen out/x86Re  --ide="vs2015" --args="is_debug=false target_cpu=\"x86\""
+gn gen out/x642015Re  --ide="vs2015" --args="is_debug=false target_cpu=\"x64\""
 ninja -C out/x862015
 
+ninja -C out/x642015Re
 Android：
 export GYP_DEFINES="OS=android"
 fetch --nohooks webrtc_android

@@ -13,9 +13,20 @@ ps -aux | grep turnserver
 # ./configure –prefix=/usr
 # make
 # make install
+0xe4c2f224256e13ad9a2e056fc993fca2
+./turnserver -o -a -f -v --mobility -m 10 -p 2010 --max-bps=1000000 --min-port=32355 --max-port=65535 --user=demo:4080218913 --user=ling2:ling1234 -r demo
+./turnserver -o -a -f -v --mobility -m 10 --max-bps=1000000  --min-port=32355 --max-port=65535 --user=demo:4080218913 --user=ling2:ling1234 -r demo
 
 coturn配置http://blog.csdn.net/u012908515/article/details/54863661
-
+http://blog.csdn.net/freewebsys/article/details/47109183
+curl -O -L https://github.com/coturn/rfc5766-turn-server/archive/3.2.5.9.tar.gz 
+ tar -zxvf 3.2.5.9.tar.gz 
+ ./turnutils_stunclient-p 2010 10.45.185.115
+ ./turnutils_stunclient  stun.ideasip.com
+ curl -O -L https://github.com/libevent/libevent/releases/download/release-2.1.8-stable/libevent-2.1.8-stable.tar.gz
+ turnutils_uclient -u demo -w 4080218913 112.74.133.54
+ turnutils_uclient -u demo -w 4080218913 118.190.157.47
+ 2001~20100
 实现：
 有2种方法可以解决这个。
 1)在Windows下转换：
