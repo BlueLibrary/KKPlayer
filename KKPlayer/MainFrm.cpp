@@ -797,11 +797,10 @@ LRESULT   CMainFrame::OnSetCursor(UINT uMsg/**/, WPARAM wParam/**/, LPARAM lPara
 	   int h2=rt2.bottom-rt2.top;
 	   int w2=rt2.right-rt2.left;
 
-	   if(h2>=h&&w2>=w)
-	   {
+	   if(h2>=h&&w2>=w){
 	   
 	   }else{
-	  ::DefWindowProc(m_hWnd,uMsg,wParam, lParam);
+	     ::DefWindowProc(m_hWnd,uMsg,wParam, lParam);
 	   }
 	  return 1;
 }

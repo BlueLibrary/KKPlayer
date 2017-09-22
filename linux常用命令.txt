@@ -19,6 +19,27 @@ ps -aux | grep turnserver
 
 ./turnserver -o -a -f -v --mobility -m 10 --max-bps=1000000  --min-port=32355 --max-port=65535 --user=demo:4080218913 --user=ling2:ling1234 -r demo
 
+傻瓜安装
+sudo apt-get install coturn。
+
+手动安装
+coturn 安装
+首先下载安装包：http://turnserver.open-sys.org/downloads/。这里提供的时所有版本的下载包地址，可以浏览器下载，然后拷贝到相应的位置。当然最常用的是命令行：
+
+wget http://turnserver.open-sys.org/downloads/v4.4.1.2/turnserver-4.4.1.2-debian-wheezy-ubuntu-mint-x86-64bits.tar.gz 
+1
+可见这里以ubuntu下4.4.1.2版本为搭建示例。解压：
+
+tar xvfz turnserver-4.4.1.2-debian-wheezy-ubuntu-mint-x86-64bits.tar.gz
+1
+在解压出来的文件里，有个文件：INSTALL 。告诉我们安装的步骤：
+sudo apt-get update
+sudo apt-get install gdebi-core
+sudo gdebi coturn*.deb
+apt-get -f install
+
+
+http://blog.csdn.net/day_day_up1991/article/details/52253892
 coturn配置http://blog.csdn.net/u012908515/article/details/54863661
 http://blog.csdn.net/freewebsys/article/details/47109183
 curl -O -L https://github.com/coturn/rfc5766-turn-server/archive/3.2.5.9.tar.gz 

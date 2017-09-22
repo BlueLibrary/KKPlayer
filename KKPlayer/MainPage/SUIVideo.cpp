@@ -6,6 +6,8 @@
 #include "../SqlOp/HistoryInfoMgr.h"
 
 #include <string>
+#include <string>
+#include <algorithm>
 
 ICallKKplayer* CreateICallKKplayer(HWND ph,DWORD stlye);
 namespace SOUI
@@ -224,25 +226,52 @@ namespace SOUI
 			 free(Buf);
 		}
 	}
+
+	static int ToLower(int c)  
+	{  
+		return tolower(c);  
+	}
+	void ToLowerStr(std::string& str)
+    {
+        std::transform(str.begin(),str.end(),str.begin(), ToLower);
+    }
+	std::string FileSuffixParse(std::string str)
+	{
+		  std::string filesuffix=str;
+		  ToLowerStr(filesuffix);
+		  int index=filesuffix.find_last_of(".");
+		  if(index>0){
+			  filesuffix=filesuffix.substr(index,filesuffix.length()-index);
+			  if(filesuffix==".torrent"){
+				  str="kkv:"+str;
+				  return str;
+			  }
+		  }
+		  return str;
+	}
 	int CSuiVideo::OpenMedia(const char *str,const char* avname)
 	{
 		m_nPlayerState=-1;
 		if(m_pIKKplayer==0)
 			return m_nPlayerState;
          std::string avpathstr=str;
+		 
+		 ///文件打开拦截处理。
+         avpathstr=FileSuffixParse(avpathstr);
 		 CHistoryInfoMgr *InfoMgr=CHistoryInfoMgr::GetInance();
 		 int UseLibRtmp=InfoMgr->GetUseLibRtmp();
 		 bool NeedDelay=false;
 		 std::string strcmd="";
 		 if(UseLibRtmp){
-	            if( !strncmp(str, "rtmp:",5))
-				{
+	         if(!strncmp(str, "rtmp:",5)){
 					avpathstr="librtmp:";
 					avpathstr+=	str;
 					NeedDelay=true;
 					strcmd="-fflags nobuffer";
-				}
+			 }
 		 }
+
+		 
 
 		 m_nPlayerState= m_pIKKplayer->OpenMedia(avpathstr.c_str(),strcmd);
 		 if(m_nPlayerState==-1)
