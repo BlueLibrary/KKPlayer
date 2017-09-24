@@ -81,6 +81,8 @@ void WillCloseKKIo(AVIOContext *io)
 {
 	if(!io)
 		return;
+	if(!io->opaque)
+		return;
     KKPlugin* pKKP=(KKPlugin*)io->opaque;
 	if(pKKP->kkPlayerWillClose!=0)
 	{

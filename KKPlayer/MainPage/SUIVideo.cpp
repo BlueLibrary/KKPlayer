@@ -278,7 +278,7 @@ namespace SOUI
 		 {
 			 SaveSnapshoot();
 			 m_pIKKplayer->CloseMedia();
-			 m_nPlayerState= m_pIKKplayer->OpenMedia(str,strcmd);
+			 m_nPlayerState= m_pIKKplayer->OpenMedia(avpathstr.c_str(),strcmd);
 			 if(m_nPlayerState<0)
 				 return m_nPlayerState;
 		 }

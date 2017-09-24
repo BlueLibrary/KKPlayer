@@ -104,6 +104,8 @@ void IPCFreeData()
 	G_guidBufMap.clear();
 	G_KKMapLock.Unlock();
 }
+
+///获取一次操作的结果
 void GetIPCOpRet(std::string& strGuid,bool& Ok,IPC_DATA_INFO &OutInfo)
 {
 	memset(&OutInfo,0,sizeof(OutInfo));
@@ -117,7 +119,17 @@ void GetIPCOpRet(std::string& strGuid,bool& Ok,IPC_DATA_INFO &OutInfo)
 	}
 	G_KKMapLock.Unlock();
 }
-
+///移除一次操作的结果信息
+void RemoveIPCOpInfo(std::string& strGuid)
+{
+	G_KKMapLock.Lock();
+	std::map<std::string,IPC_DATA_INFO>::iterator Itx=G_guidBufMap.find(strGuid);
+	if(Itx!=G_guidBufMap.end())
+	{
+		G_guidBufMap.erase(Itx);
+	}
+	G_KKMapLock.Unlock();
+}
 bool KillProcessFromName(std::wstring strProcessName)  
 {  
 	transform(strProcessName.begin(), strProcessName.end(), strProcessName.begin(),  toupper);   
@@ -385,6 +397,7 @@ LOOP1:
 		}
 		if(KKP->opaque==NULL&&KKP->kkirq!=NULL&&KKP->kkirq(KKP->PlayerOpaque)==1)
 		{
+			RemoveIPCOpInfo(strGuid);
 			break;
 		}
 	}
@@ -470,6 +483,7 @@ LOOP1:
 		}
 		if(KKP->opaque==NULL&&KKP->kkirq!=NULL&&KKP->kkirq(KKP->PlayerOpaque)==1)
 		{
+
 			break;
 		}
 	}
@@ -516,7 +530,7 @@ KKPlugin __declspec(dllexport) *CreateKKPlugin()
 	p->kkread=Kkv_read_packet;
 	p->kkseek=Kkv_seek;
 	p->opaque=NULL;
-	
+	p->kkPlayerWillClose=NULL;
 	return p;
 }
 
