@@ -38,7 +38,7 @@ AVIOContext * CreateKKIo(SKK_VideoState *kkAV)
 {
 	/*int int ll=AVERROR_EOF;
 	AVERROR(errno)*/
-	size_t len=32768;//1024*4;//
+	size_t len=65536;//32768;//1024*4;//
 	unsigned char *aviobuffer=(unsigned char*)av_malloc(len);  
 	KKPlugin* pKKP=kkAV->pKKPluginInfo->CreKKP();
 	int LenUrl=strlen(kkAV->filename)+1024;

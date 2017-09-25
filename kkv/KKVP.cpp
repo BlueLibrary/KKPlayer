@@ -375,8 +375,8 @@ LOOP1:
     jsonValue["HRW"]=(int)hRead;
 	jsonValue["FirstRead"]=KKP->FirstRead;
 	KKP->FirstRead=0;
-	if(buf_size>32768)
-		 jsonValue["BufLen"]=32768;
+	if(buf_size>65536)
+		 jsonValue["BufLen"]=65536;//32768;
 	else
     jsonValue["BufLen"]=buf_size;
 
