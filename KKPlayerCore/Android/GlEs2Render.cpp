@@ -40,17 +40,18 @@ static const char G_VERTEX_shader[] =
         "} \n";
 		
 static const char GSurfaceVertexShader[] =
-        "attribute vec4 aPosition;\n"
+        "attribute vec4 av4_Position;\n"
                 "attribute vec4 aTexCoordinate;\n"
                 "uniform mat4 texTransform;\n"
                 "varying vec2 v_TexCoordinate;\n"
+				"uniform  mat4 um4_ModelViewProjection; \n"
                 "void main() {\n"
                 "v_TexCoordinate = (texTransform * aTexCoordinate).xy;\n"
-                "gl_Position = aPosition;\n"
+                "gl_Position = um4_ModelViewProjection*av4_aPosition;\n"
                 "}\n";
 
 static const char GSurfaceFragmentShader[] =
-        "#extension GL_OES_EGL_image_external : require\n"
+                "#extension GL_OES_EGL_image_external : require\n"
                 "precision mediump float;\n"
                 "uniform samplerExternalOES  texture;\n"
                 "varying vec2 v_TexCoordinate;\n"
@@ -302,7 +303,7 @@ void GlEs2Render::GLES2_Renderer_reset()
 	}
 }
 
-
+//https://github.com/crossle/MediaPlayerSurface/blob/master/app/src/main/java/me/crossle/demo/surfacetexture/VideoSurfaceView.java
 GLuint GlEs2Render::buildProgram(const char* vertexShaderSource,
                            const char* fragmentShaderSource)
 {
@@ -481,10 +482,11 @@ int GlEs2Render::IniGl()
 	{
 		///surfacetexture ×ÅÉ«Æ÷
 		g_glSurfaceProgram=buildProgramSurfaceTexture(GSurfaceVertexShader, GSurfaceFragmentShader);
+		
 		m_textureParamHandle = glGetUniformLocation(g_glSurfaceProgram, "texture");
 		m_textureCoordHandle = glGetAttribLocation(g_glSurfaceProgram, "aTexCoordinate");
 		m_textureTranformHandle = glGetUniformLocation(g_glSurfaceProgram, "texTransform");
-		m_texturepositionHandle = glGetAttribLocation(g_glSurfaceProgram, "aPosition");
+		m_texturepositionHandle = glGetAttribLocation(g_glSurfaceProgram, "av4_Position");
 		
 		//glUniform1i(m_textureParamHandle,0);
 	}
