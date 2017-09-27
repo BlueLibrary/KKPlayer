@@ -40,15 +40,15 @@ static const char G_VERTEX_shader[] =
         "} \n";
 		
 static const char GSurfaceVertexShader[] =
-        "attribute vec4 av4_Position;\n"
+        "attribute vec4 aPosition;\n"
                 "attribute vec4 aTexCoordinate;\n"
                 "uniform mat4 texTransform;\n"
                 "varying vec2 v_TexCoordinate;\n"
-				"uniform  mat4 um4_ModelViewProjection; \n"
                 "void main() {\n"
                 "v_TexCoordinate = (texTransform * aTexCoordinate).xy;\n"
-                "gl_Position = um4_ModelViewProjection*av4_aPosition;\n"
+                "gl_Position = aPosition;\n"
                 "}\n";
+
 
 static const char GSurfaceFragmentShader[] =
                 "#extension GL_OES_EGL_image_external : require\n"
@@ -69,33 +69,6 @@ static const GLfloat g_bt709[] = {
         1.793, -0.533,  0.0,
 };
 
-struct Vertices
-    {
-        float positions[4][4];
-        float texCoords[4][4];
-    };
-
-    const float x = 0.5f;
-    const float y = 0.5f;
-    const float z = -1.0f;
-
-    static const Vertices vertices =
-    {
-        // positions
-        {
-            -x,    y,    z,
-            -x,   -y,    z,
-             x,   -y,    z,
-             x,    y,    z
-        },
-        // texCoords
-        {
-             0.0f, 1.0f, 0.0f, 1.0f,
-             0.0f, 0.0f, 0.0f, 1.0f,
-             1.0f, 0.0f, 0.0f, 1.0f,
-             1.0f, 1.0f, 0.0f, 1.0f
-        },
-    };
 	
 static void printGLString(const char *name, GLenum s)
 {
@@ -154,6 +127,13 @@ static void AVVertices_reloadVertex(GLuint av4_position,const void *vertices)
     glVertexAttribPointer(av4_position, 2, GL_FLOAT, GL_FALSE, 0, vertices);
     glEnableVertexAttribArray(av4_position);
 }
+
+static const GLfloat texTransform[16] = {
+       1.0f,   0.0f,   0.0f,   0.0f,
+       0.0f,   -1.0f,  0.0f,   0.0f,
+       0.0f,   0.0f,   1.0f,   0.0f,
+       0.0f,   1.0f,   0.0f,   1.0f
+};
 unsigned int  vao;
 
 unsigned int  vb;
@@ -177,10 +157,10 @@ GlEs2Render::GlEs2Render(KKPlayer* pPlayer):m_pGLHandle(0),gvPositionHandle(0),m
 ,g_glSurfaceProgram(0)
 ,m_vertexShaderSurfaceTexture(0)
 ,m_fragmentShaderSurfaceTexture(0)
-,m_textureParamHandle(0)
-,m_texturepositionHandle(0)
-,m_textureCoordHandle(0)
-,m_textureTranformHandle(0)
+,m_texture_ParamHandle(0)
+,m_texture_positionHandle(0)
+,m_texture_CoordHandle(0)
+,m_texture_TranformHandle(0)
 ,m_bAvPicLoaded(0)
 ,m_UsedViewSurfaceed(0)
 ,setDefaultBufferSizeMethodId(0)
@@ -287,16 +267,12 @@ void GlEs2Render::GLES2_Renderer_reset()
 	
 	///硬件使用的代码块
 	{
-		  glDeleteTextures(1, &m_textureParamHandle);
-		  m_textureParamHandle=0;
+		  glDeleteTextures(1, &m_texture_ParamHandle);
+		  m_texture_ParamHandle=0;
 			
-		  glDeleteTextures(1, &m_texturepositionHandle);
-		  m_texturepositionHandle=0;
+		  glDeleteTextures(1, &m_texture_positionHandle);
+		  m_texture_positionHandle=0;
 		 
-		  glDeleteTextures(1, &m_texturepositionHandle);
-		  m_texturepositionHandle=0;
-		  GLuint m_textureCoordHandle;
-		  GLuint m_textureTranformHandle;
 			
 		  if(g_SurfaceTextVId!=0)
 			glDeleteTextures(1, &g_SurfaceTextVId);/**/
@@ -483,12 +459,68 @@ int GlEs2Render::IniGl()
 		///surfacetexture 着色器
 		g_glSurfaceProgram=buildProgramSurfaceTexture(GSurfaceVertexShader, GSurfaceFragmentShader);
 		
-		m_textureParamHandle = glGetUniformLocation(g_glSurfaceProgram, "texture");
-		m_textureCoordHandle = glGetAttribLocation(g_glSurfaceProgram, "aTexCoordinate");
-		m_textureTranformHandle = glGetUniformLocation(g_glSurfaceProgram, "texTransform");
-		m_texturepositionHandle = glGetAttribLocation(g_glSurfaceProgram, "av4_Position");
-		
-		//glUniform1i(m_textureParamHandle,0);
+		m_texture_ParamHandle = glGetUniformLocation(g_glSurfaceProgram, "texture");
+		m_texture_positionHandle = glGetAttribLocation(g_glSurfaceProgram, "aPosition");
+		m_texture_CoordHandle = glGetAttribLocation(g_glSurfaceProgram, "aTexCoordinate");
+		m_texture_TranformHandle = glGetUniformLocation(g_glSurfaceProgram, "texTransform");
+	
+
+		   /* struct Vertices
+			{
+				float positions[4][4];
+				float texCoords[4][4];
+			};
+
+			const float x = 0.5f;
+			const float y = 0.5f;
+			const float z = -1.0f;
+
+			static const Vertices vertices =
+			{
+				// positions
+				{
+					-x,    y,    z,
+					-x,   -y,    z,
+					 x,   -y,    z,
+					 x,    y,    z
+				},
+				// texCoords
+				{
+					 0.0f, 1.0f, 0.0f, 1.0f,
+					 0.0f, 0.0f, 0.0f, 1.0f,
+					 1.0f, 0.0f, 0.0f, 1.0f,
+					 1.0f, 1.0f, 0.0f, 1.0f
+				},
+			};
+
+			static const unsigned short indices[] = {
+			  0, 1, 2,  0, 2 ,3
+			};
+
+			 glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ib );
+			
+			 glGenVertexArraysOES( 1, &vao );
+             glBindVertexArrayOES( vao );
+
+			 glGenBuffers( 1, &vb );
+			 glBindBuffer( GL_ARRAY_BUFFER, vb );
+			 glBufferData( GL_ARRAY_BUFFER, sizeof( vertices ), &vertices, GL_STATIC_DRAW );
+
+			 glGenBuffers( 1, &ib ) ;
+			 glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ib );
+			 glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices ), indices, GL_STATIC_DRAW );
+
+
+			glEnableVertexAttribArray ( m_texture_positionHandle  );
+			glVertexAttribPointer ( m_texture_positionHandle , 3, GL_FLOAT, false, 0, (const GLvoid *)offsetof( Vertices, positions ));
+
+			glEnableVertexAttribArray ( m_texture_CoordHandle );
+			glVertexAttribPointer ( m_texture_CoordHandle, 4, GL_FLOAT, false, 0, (const GLvoid *)offsetof( Vertices, texCoords ));
+
+            glBindVertexArrayOES( 0 );
+			glDisableVertexAttribArray( m_texture_positionHandle  ) ;
+			glDisableVertexAttribArray( m_texture_CoordHandle );
+*/			
 	}
    
     return m_pGLHandle;
@@ -527,6 +559,7 @@ jobject GlEs2Render::GenerateSurface()
 jobject GlEs2Render::SetSurfaceTexture(JNIEnv *env)
 {
 	m_penv=env;
+	glUseProgram(g_glSurfaceProgram);
     glGenTextures(1,&g_SurfaceTextVId);
 	glBindTexture(GL_TEXTURE_EXTERNAL_OES, g_SurfaceTextVId);
 	glTexParameterf(GL_TEXTURE_EXTERNAL_OES,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
@@ -708,16 +741,12 @@ void GlEs2Render::GlViewRender(bool ReLoad)
         m_AVVertices[7] =   nH;
 
 		if(m_UsedViewSurfaceed){
-             AVVertices_reloadVertex(m_texturepositionHandle, m_AVVertices);
+             AVVertices_reloadVertex(m_texture_positionHandle, m_AVVertices);
 			 AVTexCoords_reset();
              AVTexCoords_cropRight(0);
-			 AVTexCoords_reloadVertex(m_textureCoordHandle,m_AVTexcoords);
+			 AVTexCoords_reloadVertex(m_texture_CoordHandle,m_AVTexcoords);
 			 
-			/* glEnableVertexAttribArray (m_texturepositionHandle );
-             glVertexAttribPointer ( m_texturepositionHandle, 3, GL_FLOAT, false, 0, (const GLvoid *)offsetof( Vertices, positions ));
-
-             glEnableVertexAttribArray ( m_textureCoordHandle );
-            glVertexAttribPointer ( m_textureCoordHandle, 4, GL_FLOAT, false, 0, (const GLvoid *)offsetof( Vertices, texCoords ));*/
+		/**/
 	
 		}else{
 			 AVVertices_reloadVertex(g_av4_position, m_AVVertices);
@@ -736,7 +765,8 @@ void GlEs2Render::GlViewRender(bool ReLoad)
 	} 
 	if(m_bAvPicLoaded==0)
 		glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
-	else /*if(m_UsedViewSurfaceed){
+	else  /*if(m_UsedViewSurfaceed){
+		     glBindVertexArrayOES(vao);
 	         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void *)0);
 		}else*/
 		{
@@ -790,10 +820,9 @@ void GlEs2Render::render(kkAVPicInfo *Picinfo,bool wait)
 		              glActiveTexture(GL_TEXTURE0) ;
                       glBindTexture(GL_TEXTURE_EXTERNAL_OES, g_SurfaceTextVId) ;
 					  LOGI("MEDIACODEC  render\n");
-					  glUniform1i(m_textureParamHandle, 0);
+					  glUniform1i(m_texture_ParamHandle, 0);
 
-                      glUniformMatrix4fv(m_textureTranformHandle, 1, GL_FALSE, m_AVTexcoords);
-					
+                      glUniformMatrix4fv(m_texture_TranformHandle, 1, GL_FALSE, texTransform);
                 }else{
 					//Picinfo->picformat!=(int)AV_PIX_FMT_MEDIACODEC
 					int     planes[3]    = { 0, 1, 2 };

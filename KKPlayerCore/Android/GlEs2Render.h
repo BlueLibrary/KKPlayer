@@ -1,5 +1,6 @@
 #ifndef GlEs2Render_H_
 #define GlEs2Render_H_
+#define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #include <android/log.h>
@@ -96,10 +97,10 @@ class GlEs2Render: public IkkRender
 		GLuint g_glSurfaceProgram;
 		GLuint m_vertexShaderSurfaceTexture;
         GLuint m_fragmentShaderSurfaceTexture;
-		GLuint m_textureParamHandle;
-        GLuint m_texturepositionHandle;
-        GLuint m_textureCoordHandle;
-        GLuint m_textureTranformHandle;
+		GLuint m_texture_ParamHandle;
+        GLuint m_texture_positionHandle;
+        GLuint m_texture_CoordHandle;
+        GLuint m_texture_TranformHandle;
 	
 		jmethodID updateTexImageMethodId;
 		jmethodID getTimestampMethodId;

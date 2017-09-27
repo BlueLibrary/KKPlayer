@@ -1500,10 +1500,11 @@ int queue_picture(SKK_VideoState *is, AVFrame *pFrame, double pts,double duratio
 		}else
 #endif/**/
 		if(pOutAV->format==AV_PIX_FMT_MEDIACODEC){///AndroidÓ²½âÂë¸ñÊ½
-		      av_frame_move_ref(vp->frame,pOutAV);
 			  vp->picformat=AV_PIX_FMT_MEDIACODEC;
-			  LOGE_KK("dex AV_PIX_FMT_MEDIACODE\n");
-
+		       AVMediaCodecBuffer* mcbufeer =(AVMediaCodecBuffer*)pOutAV->buf[3];
+			   int xxxx=av_mediacodec_release_buffer(mcbufeer,1);
+			   //MediaCodecDecContext* mctx==mcbufeer->ctx;
+			  LOGE_KK("dex AV_PIX_FMT_MEDIACODE %d\n",xxxx);
 		}else if(is->DstAVff!=format&&is->Hard_Code!=SKK_VideoState::HARD_CODE_QSV&&format!=AV_PIX_FMT_NV12||copydata)
 		{
 			
