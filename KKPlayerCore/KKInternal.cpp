@@ -997,18 +997,18 @@ int stream_component_open(SKK_VideoState *is, int stream_index)
 				   }
 				   
 				   if(codec!=NULL){
-					// avctx->get_format=mediacodec_GetFormat;
-				     AVMediaCodecContext *mc = av_mediacodec_alloc_context();
+					    avctx->get_format=mediacodec_GetFormat;
+				        AVMediaCodecContext *mc = av_mediacodec_alloc_context();
 
-					 mc->surface =is->ViewSurface;
+					     mc->surface =is->ViewSurface;
                     /* avctx->hwaccel_context = mc;*/
+                         avctx->hwaccel_context =mc;
+       //                int retx=av_mediacodec_default_init(avctx, mc,is->ViewSurface);
+					  //if(retx==AVERROR_EXTERNAL)
+					  // LOGE_KK("mediacodec ViewSurface err %d \n",(int)is->ViewSurface); 
 
-                       int retx=av_mediacodec_default_init(avctx, mc,is->ViewSurface);
-					  if(retx==AVERROR_EXTERNAL)
-					   LOGE_KK("mediacodec ViewSurface err %d \n",(int)is->ViewSurface); 
-
-					   LOGE_KK("mediacodec ViewSurface %d \n",(int)is->ViewSurface); 
-					   LOGE_KK("mc ViewSurface %d \n",(int)mc->surface); 
+					  // LOGE_KK("mediacodec ViewSurface %d \n",(int)is->ViewSurface); 
+					  // LOGE_KK("mc ViewSurface %d \n",(int)mc->surface); 
 
 					   ///pix_fmt = ff_get_format(avctx, pix_fmts); 不知道为啥没有返回 AV_PIX_FMT_MEDIACODEC；，修改一下ffmpeg的源码看看，行不行。
 					   char abcd[64]="";
@@ -1049,6 +1049,13 @@ int stream_component_open(SKK_VideoState *is, int stream_index)
 		LOGE_KK("avcodec_open2 %d",avctx->codec_type);  
 		//失败
 		assert(0);
+	}else{
+#ifndef WIN32
+		if(avctx->codec_type == AVMEDIA_TYPE_VIDEO){
+	       AVMediaCodecContext *mc=(AVMediaCodecContext *)avctx->hwaccel_context;
+           LOGE_KK("mc ViewSurface %d \n",(int)mc->surface); 
+		}
+#endif
 	}
 	
  // 
@@ -1056,7 +1063,8 @@ int stream_component_open(SKK_VideoState *is, int stream_index)
 	                   enum AVPixelFormat pix_fmt;
                        const enum AVPixelFormat pix_fmts[2] = {AV_PIX_FMT_MEDIACODEC,AV_PIX_FMT_NONE};
                        pix_fmt =(AVPixelFormat) av_get_format(avctx, pix_fmts);
-					   LOGE_KK("mediacodec pix_fmt %d  %d  %d \n",pix_fmt,avctx->codec->pix_fmts, avctx->pix_fmt,avctx->sw_pix_fmt);  
+					   LOGE_KK("mediacodec pix_fmt avctx->codec->pix_fmts:%d  avctx->pix_fmt:%d  avctx->sw_pix_fmt:%d pix_fmt:%d AV_PIX_FMT_MEDIACODEC:%d\n",
+						   pix_fmt,avctx->codec->pix_fmts, avctx->pix_fmt,avctx->sw_pix_fmt,pix_fmt,AV_PIX_FMT_MEDIACODEC);  
 					   LOGE_KK("codec %s  %d  \n",codec->name);  
 					  // avctx->sw_pix_fmt=AV_PIX_FMT_MEDIACODEC;
 					  //  avctx->pix_fmt
@@ -1491,7 +1499,12 @@ int queue_picture(SKK_VideoState *is, AVFrame *pFrame, double pts,double duratio
 			 }
 		}else
 #endif/**/
-		if((is->DstAVff!=format&&is->Hard_Code!=SKK_VideoState::HARD_CODE_QSV&&format!=AV_PIX_FMT_NV12&&format!=AV_PIX_FMT_MEDIACODEC)||copydata)
+		if(pOutAV->format==AV_PIX_FMT_MEDIACODEC){///Android硬解码格式
+		      av_frame_move_ref(vp->frame,pOutAV);
+			  vp->picformat=AV_PIX_FMT_MEDIACODEC;
+			  LOGE_KK("dex AV_PIX_FMT_MEDIACODE\n");
+
+		}else if(is->DstAVff!=format&&is->Hard_Code!=SKK_VideoState::HARD_CODE_QSV&&format!=AV_PIX_FMT_NV12||copydata)
 		{
 			
 			is->img_convert_ctx = sws_getCachedContext(is->img_convert_ctx,

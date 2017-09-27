@@ -967,7 +967,7 @@ void KKPlayer::RenderImage(IkkRender *pRender,bool Force)
 								}
 							}
 						}else {
-							bool okkk=false;
+							            bool bNeedforce=false;///Ç¿ÖÆË¢ÐÂ
 										if(m_bOpen&&m_nPreFile!=0){ 
 												if(pVideoInfo->IsReady==0){
 															if(pVideoInfo->abort_request==0){
@@ -975,7 +975,7 @@ void KKPlayer::RenderImage(IkkRender *pRender,bool Force)
 																  unsigned char* pWaitImage=m_pPlayUI->GetWaitImage(len,0);
 																  if(pWaitImage!=NULL){
 																	 pRender->SetWaitPic(pWaitImage,len);
-																	 okkk=true;
+																	bNeedforce=true;
 																  }
 															}else{
 															     pRender->SetWaitPic(0,0);
@@ -990,10 +990,16 @@ void KKPlayer::RenderImage(IkkRender *pRender,bool Force)
 													   /*if(vp->serial<iddd)
 														   assert(0);*/
 													   iddd=vp->serial;
-													   if(vp->Bmp.data[0]!=NULL&&(m_lstPts!=vp->pts||Force))
+													   if(vp->Bmp.data[0]!=NULL&&(m_lstPts!=vp->pts||Force)||AV_PIX_FMT_MEDIACODEC)
 													   {
-														  
-														   if(!vp->uploaded&&vp->picformat!=(int)AV_PIX_FMT_DXVA2_VLD)
+														   if(vp->picformat==(int)AV_PIX_FMT_MEDIACODEC){
+														   
+															   kkAVPicInfo picinfo;
+															   picinfo.width=vp->width;
+															   picinfo.height=vp->height;
+															   picinfo.picformat=vp->picformat;
+															   pRender->render(&picinfo,bNeedforce);
+														   }else if(!vp->uploaded&&vp->picformat!=(int)AV_PIX_FMT_DXVA2_VLD)
 														   {
 															  
 															   kkAVPicInfo picinfo;
@@ -1003,10 +1009,10 @@ void KKPlayer::RenderImage(IkkRender *pRender,bool Force)
 															   picinfo.height=vp->height;
 															   picinfo.picformat=vp->picformat;
 															  
-															   pRender->render(&picinfo,okkk);
+															   pRender->render(&picinfo,bNeedforce);
 															   
-														   }else if(okkk){
-														       pRender->render(NULL,okkk);
+														   }else if(bNeedforce){
+														       pRender->render(NULL,bNeedforce);
 														   }
 													   }else if(pVideoInfo->IsReady==0){
 														   pRender->render(NULL,true);

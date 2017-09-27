@@ -205,11 +205,7 @@ JNIEXPORT jint JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_GetkkMediaIn
 		if(strlen(info.AVRes)>0)
 		env->SetObjectField(jInfo, jfsAVRes, env->NewStringUTF(info.AVRes));
       
-	    /// 文件路径
-        jfieldID jfsAvFile = env->GetFieldID(Infocls, "AvFile", "Ljava/lang/String;");
-        if(info.AvFile!=NULL&&strlen(info.AvFile)>0)		
-		env->SetObjectField(jInfo, jfsAvFile, cToJstringutf(env,info.AvFile));
-	
+	    
 	    ///视频解码器名称
 	    jfieldID jfVideoCodecname = env->GetFieldID(Infocls, "VideoCodecname", "Ljava/lang/String;");
         if(strlen(info.videoinfo.codecname)>0)		

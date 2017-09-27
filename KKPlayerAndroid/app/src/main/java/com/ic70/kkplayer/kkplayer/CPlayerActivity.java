@@ -58,12 +58,13 @@ public class CPlayerActivity extends Activity {
     }; /* */
    public  enum  EnumPlayerStata
    {
+       IniFirst,
        OpenFailure,
        Stop,
        Play,
        PAUSE
    }
-    EnumPlayerStata PlayerStata=EnumPlayerStata.Stop;
+    EnumPlayerStata PlayerStata=EnumPlayerStata.IniFirst;
     int m_CurTime=0;
     String MoviePathStr;
     int m_OpenCouner=0;
@@ -271,12 +272,14 @@ public class CPlayerActivity extends Activity {
 
         m_KKPlayer.SetDecoderMethod(nMediacodec);
         ///这里有点问题
-        m_KKPlayer.OpenMedia(MoviePathStr,false);
-        m_KKPlayer.SetMinRealtimeDelay(m_MinRealtimeDelay);
+      //  m_KKPlayer.OpenMedia(MoviePathStr,false);
+        //m_KKPlayer.SetMinRealtimeDelay(m_MinRealtimeDelay);
         m_CurTime=0;
-        PlayerStata = EnumPlayerStata.Play;
-        WaitGif();
+        //PlayerStata = EnumPlayerStata.Play;
+
     }
+
+
     public void WaitGif()
     {
 
@@ -297,7 +300,13 @@ public class CPlayerActivity extends Activity {
     public void onStart()
     {
         super.onStart();
-        if(PlayerStata==EnumPlayerStata.PAUSE)
+        if(PlayerStata==EnumPlayerStata.IniFirst) {
+            WaitGif();
+            m_KKPlayer.OpenMedia(MoviePathStr, true);
+            m_KKPlayer.SetMinRealtimeDelay(m_MinRealtimeDelay);
+            m_CurTime = 0;
+            PlayerStata = EnumPlayerStata.Play;
+        }else if(PlayerStata==EnumPlayerStata.PAUSE)
         {
             FunPalyState();
         }

@@ -19,6 +19,7 @@ class GlEs2Render: public IkkRender
 			
 			jobject  SetSurfaceTexture(JNIEnv *env);
 			jobject  GetSurfaceTexture();
+			jobject  GetViewSurface();
 			void     setFrameAvailable(bool const available);
 	private:
 	        ///生成一个Surface与SurfaceTexture绑定
@@ -103,10 +104,12 @@ class GlEs2Render: public IkkRender
 		jmethodID updateTexImageMethodId;
 		jmethodID getTimestampMethodId;
 		jmethodID getTransformMtxId ;
+		jmethodID setDefaultBufferSizeMethodId;
 		jobject   javaSurfaceTextureObj;
 		jobject   javaViewSurfaceObj;
         JNIEnv   *m_penv;
 		bool     m_bfameAvailable;
 		int      m_bAvPicLoaded;
+		int      m_UsedViewSurfaceed;
 };
 #endif

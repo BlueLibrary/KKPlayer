@@ -67,6 +67,35 @@ static const GLfloat g_bt709[] = {
         0.0,   -0.213,  2.112,
         1.793, -0.533,  0.0,
 };
+
+struct Vertices
+    {
+        float positions[4][4];
+        float texCoords[4][4];
+    };
+
+    const float x = 0.5f;
+    const float y = 0.5f;
+    const float z = -1.0f;
+
+    static const Vertices vertices =
+    {
+        // positions
+        {
+            -x,    y,    z,
+            -x,   -y,    z,
+             x,   -y,    z,
+             x,    y,    z
+        },
+        // texCoords
+        {
+             0.0f, 1.0f, 0.0f, 1.0f,
+             0.0f, 0.0f, 0.0f, 1.0f,
+             1.0f, 0.0f, 0.0f, 1.0f,
+             1.0f, 1.0f, 0.0f, 1.0f
+        },
+    };
+	
 static void printGLString(const char *name, GLenum s)
 {
     const char *v = (const char *)::glGetString(s);
@@ -124,7 +153,10 @@ static void AVVertices_reloadVertex(GLuint av4_position,const void *vertices)
     glVertexAttribPointer(av4_position, 2, GL_FLOAT, GL_FALSE, 0, vertices);
     glEnableVertexAttribArray(av4_position);
 }
+unsigned int  vao;
 
+unsigned int  vb;
+unsigned int  ib;
 //PlayVideo-OpenGL
 GlEs2Render::GlEs2Render(KKPlayer* pPlayer):m_pGLHandle(0),gvPositionHandle(0),m_Screen_Width(0)
 ,m_Screen_Height(0),m_nTextureID(0),m_bAdJust(false)
@@ -149,6 +181,8 @@ GlEs2Render::GlEs2Render(KKPlayer* pPlayer):m_pGLHandle(0),gvPositionHandle(0),m
 ,m_textureCoordHandle(0)
 ,m_textureTranformHandle(0)
 ,m_bAvPicLoaded(0)
+,m_UsedViewSurfaceed(0)
+,setDefaultBufferSizeMethodId(0)
 {
 	
 
@@ -181,6 +215,10 @@ GlEs2Render::GlEs2Render(KKPlayer* pPlayer):m_pGLHandle(0),gvPositionHandle(0),m
     m_AVTexcoords[5]=0.0f;
     m_AVTexcoords[6]=1.0f;
     m_AVTexcoords[7]=0.0f;
+	
+	vao=0;
+    vb=0;
+	ib=0;
 	
 }
 GlEs2Render::~GlEs2Render()
@@ -444,9 +482,11 @@ int GlEs2Render::IniGl()
 		///surfacetexture ×ÅÉ«Æ÷
 		g_glSurfaceProgram=buildProgramSurfaceTexture(GSurfaceVertexShader, GSurfaceFragmentShader);
 		m_textureParamHandle = glGetUniformLocation(g_glSurfaceProgram, "texture");
-		m_texturepositionHandle = glGetAttribLocation(g_glSurfaceProgram, "aPosition");
 		m_textureCoordHandle = glGetAttribLocation(g_glSurfaceProgram, "aTexCoordinate");
 		m_textureTranformHandle = glGetUniformLocation(g_glSurfaceProgram, "texTransform");
+		m_texturepositionHandle = glGetAttribLocation(g_glSurfaceProgram, "aPosition");
+		
+		//glUniform1i(m_textureParamHandle,0);
 	}
    
     return m_pGLHandle;
@@ -521,7 +561,7 @@ jobject GlEs2Render::SetSurfaceTexture(JNIEnv *env)
     if ( !updateTexImageMethodId ) {
        LOGE("couldn't get updateTexImageMethonId");
     }
-
+  setDefaultBufferSizeMethodId= env->GetMethodID(surfaceTextureClass, "setDefaultBufferSize","(II)V");
     getTimestampMethodId =env->GetMethodID(surfaceTextureClass, "getTimestamp", "()J");
     if (!getTimestampMethodId) {
        LOGE("couldn't get TimestampMethodId");
@@ -537,6 +577,11 @@ jobject GlEs2Render::SetSurfaceTexture(JNIEnv *env)
 	
 	GenerateSurface();
 	return javaSurfaceTextureObj;
+}
+jobject  GlEs2Render::GetViewSurface()
+{
+	
+	return javaViewSurfaceObj;
 }
 jobject  GlEs2Render::GetSurfaceTexture()
 {
@@ -554,7 +599,7 @@ void GlEs2Render::AVTexCoords_reset()
     m_AVTexcoords[6] = 1.0f;
     m_AVTexcoords[7] = 0.0f;
 }
-
+//https://github.com/ChouRay/PlayVideo-OpenGL/blob/master/app/jni/NativeMedia.cpp
 void GlEs2Render::AVTexCoords_cropRight(GLfloat cropRight)
 {
     m_AVTexcoords[0] = 0.0f;
@@ -577,16 +622,28 @@ void GlEs2Render::GlViewRender(bool ReLoad)
 		 LOGE("g_glProgram=%d m_vertexShader=%d||m_fragmentShader=%d \n", g_glProgram,m_vertexShader,m_fragmentShader);
          return;
 	}
+	m_UsedViewSurfaceed=1;
+	if(m_UsedViewSurfaceed)
+	   glUseProgram(g_glSurfaceProgram);
+	if(m_penv){
+	     m_penv->CallVoidMethod(javaSurfaceTextureObj, updateTexImageMethodId);
+		 LOGE("javaSurfaceTextureObj updateTexImageMethodId \n", m_nKeepRatio);
+	}
    /* if(m_bfameAvailable&&m_penv&&javaSurfaceTextureObj){
 	  m_penv->CallVoidMethod(javaSurfaceTextureObj, updateTexImageMethodId);
 	}*/
 	glClear(GL_COLOR_BUFFER_BIT);
 	//glUseProgram(g_glProgram);
+	
     if(!m_bAdJust&&m_Picwidth!=0&& m_Picheight!=0||m_nKeepRatio!=m_nLastKeepRatio)
     {
         float width     =m_Picwidth;
         float height    = m_Picheight;
 		m_nLastKeepRatio=m_nKeepRatio;
+		
+		if(m_penv){
+		   m_penv->CallVoidMethod(javaSurfaceTextureObj, setDefaultBufferSizeMethodId, m_Picwidth,m_Picheight);
+		}
 		if(m_nKeepRatio==2){
 			///4:3
 			float height1    =(float) (m_RenderWidth*3.0)/4.0;
@@ -648,10 +705,24 @@ void GlEs2Render::GlViewRender(bool ReLoad)
         m_AVVertices[6] =   nW;
         m_AVVertices[7] =   nH;
 
-        AVVertices_reloadVertex(g_av4_position, m_AVVertices);
-        AVTexCoords_reset();
-        AVTexCoords_cropRight(0);
-        AVTexCoords_reloadVertex(g_av2_texcoord,  m_AVTexcoords);
+		if(m_UsedViewSurfaceed){
+             AVVertices_reloadVertex(m_texturepositionHandle, m_AVVertices);
+			 AVTexCoords_reset();
+             AVTexCoords_cropRight(0);
+			 AVTexCoords_reloadVertex(m_textureCoordHandle,m_AVTexcoords);
+			 
+			/* glEnableVertexAttribArray (m_texturepositionHandle );
+             glVertexAttribPointer ( m_texturepositionHandle, 3, GL_FLOAT, false, 0, (const GLvoid *)offsetof( Vertices, positions ));
+
+             glEnableVertexAttribArray ( m_textureCoordHandle );
+            glVertexAttribPointer ( m_textureCoordHandle, 4, GL_FLOAT, false, 0, (const GLvoid *)offsetof( Vertices, texCoords ));*/
+	
+		}else{
+			 AVVertices_reloadVertex(g_av4_position, m_AVVertices);
+             AVTexCoords_reset();
+             AVTexCoords_cropRight(0);
+             AVTexCoords_reloadVertex(g_av2_texcoord,  m_AVTexcoords);
+		}
         m_bAdJust=true;
 		
     }
@@ -662,9 +733,14 @@ void GlEs2Render::GlViewRender(bool ReLoad)
 	  
 	} 
 	if(m_bAvPicLoaded==0)
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	else
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
+	else /*if(m_UsedViewSurfaceed){
+	         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void *)0);
+		}else*/
+		{
+			
+			 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		}
     checkGlError("glDrawArrays");
 	//glUseProgram(0);
     if(m_Picwidth==0|| m_Picheight==0)
@@ -694,10 +770,11 @@ void GlEs2Render::resize(unsigned int w, unsigned int h)
 }
 void GlEs2Render::render(kkAVPicInfo *Picinfo,bool wait)
 {
-	
+	LOGE("Picinfo %d ",Picinfo);
     if(Picinfo!=NULL&&Picinfo->width!=0&&Picinfo->height!=0)
     {
-		m_bAvPicLoaded=1;
+		
+		        m_bAvPicLoaded=1;
 				if(m_Picheight!= Picinfo->height||m_Picwidth!=Picinfo->width)
 				{
 					m_Picwidth=Picinfo->width;
@@ -706,9 +783,17 @@ void GlEs2Render::render(kkAVPicInfo *Picinfo,bool wait)
 					
 				}
 				LOGI("MEDIACODEC 22-- %d  %d \n",(int)AV_PIX_FMT_MEDIACODEC, Picinfo->picformat);
-                if(Picinfo->picformat!=(int)AV_PIX_FMT_MEDIACODEC)
-				{
+                
+				if(m_UsedViewSurfaceed){
+		              glActiveTexture(GL_TEXTURE0) ;
+                      glBindTexture(GL_TEXTURE_EXTERNAL_OES, g_SurfaceTextVId) ;
+					  LOGI("MEDIACODEC  render\n");
+					  glUniform1i(m_textureParamHandle, 0);
+
+                      glUniformMatrix4fv(m_textureTranformHandle, 1, GL_FALSE, m_AVTexcoords);
 					
+                }else{
+					//Picinfo->picformat!=(int)AV_PIX_FMT_MEDIACODEC
 					int     planes[3]    = { 0, 1, 2 };
 					const GLsizei widths[3]    = { Picinfo->linesize[0], Picinfo->linesize[1], Picinfo->linesize[2] };
 				   // const GLsizei widths[3]    = { Picinfo->width, Picinfo->width/2, Picinfo->width/2};
@@ -731,11 +816,7 @@ void GlEs2Render::render(kkAVPicInfo *Picinfo,bool wait)
 									 GL_UNSIGNED_BYTE,
 									 pixels[plane]);
 				        }
-	            }else{
-					  glActiveTexture(GL_TEXTURE0) ;
-                      glBindTexture(GL_TEXTURE_EXTERNAL_OES, g_SurfaceTextVId) ;
-					  LOGI("MEDIACODEC  render\n");
-				}
+	            }
     }
 }
 void GlEs2Render::renderBk(unsigned char* buf,int len)

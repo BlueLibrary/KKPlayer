@@ -41,7 +41,7 @@ public class CKKPlayerGlRender implements GLSurfaceView.Renderer,SurfaceTexture.
     {
 
         if(m_nKKPlayer!=0)
-            m_JniKKPlayer. OnSurfaceTextureFrameAailable(m_nKKPlayer);
+            m_JniKKPlayer.OnSurfaceTextureFrameAailable(m_nKKPlayer);
         Log.i("xxxx", "onFrameAvailable");
     }
     @Override
@@ -49,6 +49,8 @@ public class CKKPlayerGlRender implements GLSurfaceView.Renderer,SurfaceTexture.
     {
         // Log.v("m_nKKPlayer", "="+m_nKKPlayer);
         if(m_nKKPlayer!=0){
+            if(m_mediacodecSurfaceTexture!=null)
+            m_mediacodecSurfaceTexture.updateTexImage();
             m_JniKKPlayer.GlRender(m_nKKPlayer);
         }
     }

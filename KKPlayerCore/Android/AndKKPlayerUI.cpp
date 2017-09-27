@@ -80,11 +80,13 @@ void CAndKKPlayerUI::SetSurfaceTexture(JNIEnv *env)
 	if(m_pRender!=NULL){
 	   GlEs2Render*  pRender =(GlEs2Render* )m_pRender;
 	   obj=pRender->SetSurfaceTexture(env);
+	   LOGI(" SetSurfaceTexture obj= %d\n",obj);
+	   obj=pRender->GetViewSurface();
+	   m_player.SetViewSurface(obj);
 	}
 	m_RenderLock.Unlock();
 
-	LOGI(" SetSurfaceTexture obj= %d\n",obj);
-	m_player.SetSurfaceTexture(obj);
+	
 }
 
 jobject CAndKKPlayerUI::GetSurfaceTexture()
