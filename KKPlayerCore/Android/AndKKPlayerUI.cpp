@@ -194,8 +194,9 @@ void CAndKKPlayerUI::GlViewRender()
 	
 	m_RenderLock.Lock();
 	if(m_pRender!=NULL){
+	   bool bSurfaceDisplay=m_player.IsMediacodecSurfaceDisplay();
 	   GlEs2Render*  pRender =(GlEs2Render* )m_pRender;
-	   pRender->GlViewRender(m_nRefreshPic);
+	   pRender->GlViewRender(m_nRefreshPic,bSurfaceDisplay);
 	   m_nRefreshPic=0;
 	}
 	m_RenderLock.Unlock();

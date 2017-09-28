@@ -4,7 +4,7 @@
 #ifdef _WINDOWS
      #define WIN32_KK  //否则使用pthred线程
 #else
-     #define Android_Plat
+     #define Android_Plat 1
 #endif
 #ifndef stdafx_H_KK_
 #define stdafx_H_KK_

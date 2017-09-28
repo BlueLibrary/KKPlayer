@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements IKKMessageHandler
         txtAvUrl = (EditText) findViewById(R.id.AVeditText);
         Button btx2 = (Button) findViewById(R.id.AVbutton2);
         //SurfaceRender=(CKKPlayerSurfaceRender)findViewById(R.id.surfaceView);
+        ///启动播放器
         btx2.setOnClickListener(new Button.OnClickListener() {//创建监听
             public void onClick(View v) {
                /* SurfaceRender.CreatePlayer();
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements IKKMessageHandler
 
         });
 
+        ///本地文件浏览
         Button locfilebtx2 = (Button) findViewById(R.id.locfilebutton);
         locfilebtx2.setOnClickListener(new Button.OnClickListener() {//创建监听
             public void onClick(View v) {
@@ -175,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements IKKMessageHandler
                         public void callback(Bundle bundle) {
                             String filepath = bundle.getString("path");
                             setTitle(filepath); // 把文件路径显示在标题上
+                            txtAvUrl.setText(filepath);
                         }
                     },
                     ".mp4;",

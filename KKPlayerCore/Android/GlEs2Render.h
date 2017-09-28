@@ -12,7 +12,7 @@ class GlEs2Render: public IkkRender
 	        GlEs2Render(KKPlayer* pPlayer);
 			~GlEs2Render();
 	public:	
-			void  GlViewRender(bool ReLoad);
+			void  GlViewRender(bool ReLoad,bool bSurfaceDisplay);
 			/***
 			*是否保持长宽比例
 			*/

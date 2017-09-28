@@ -109,7 +109,9 @@ class KKPlayer
 			{
 			    return m_pVideoRefreshJNIEnv;
 			}
-			void    SetViewSurface(void* surface) ;
+			///设置Surface,用于硬件渲染。
+			void    SetViewSurface(void* surface);
+			bool    IsMediacodecSurfaceDisplay();
 #endif
 
 private:
@@ -187,6 +189,7 @@ private:
 			//当前包序列号
 			volatile int                    m_PktSerial;
 	        IKKAudio*                       m_pSound;
+			///窗口句柄
 			HWND                            m_hwnd;
 			int64_t                         start_time;
 			
@@ -214,10 +217,11 @@ private:
 			int                             m_AudioPicBufLen;
 			//解码后图形的格式
 			AVPixelFormat                   m_DstAVff;
-			double                             m_nOpenTime;
+			double                          m_nOpenTime;
 #ifdef Android_Plat
-			void *  m_pVideoRefreshJNIEnv;
-			void*   m_pViewSurface;
+			void*                           m_pVideoRefreshJNIEnv;
+			void*                           m_pViewSurface;
+			bool                            m_bSurfaceDisplay;
 #endif
 			
 };

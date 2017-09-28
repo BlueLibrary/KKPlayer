@@ -982,7 +982,7 @@ int stream_component_open(SKK_VideoState *is, int stream_index)
 			   
 			   
       #else 
-	           LOGE_KK("kkmediacodec \n"); 
+	           //LOGE_KK("kkmediacodec \n"); 
 			   if(is->Hard_Code==SKK_VideoState::HARD_CODE_MEDIACODEC){
 			       if(avctx->codec_id==AV_CODEC_ID_H264){
 			            codec = avcodec_find_decoder_by_name("h264_mediacodec"); 
@@ -996,41 +996,40 @@ int stream_component_open(SKK_VideoState *is, int stream_index)
 					   codec = avcodec_find_decoder_by_name("hevc_mediacodec");
 				   }
 				   
-				   if(codec!=NULL){
-					    avctx->get_format=mediacodec_GetFormat;
-				        AVMediaCodecContext *mc = av_mediacodec_alloc_context();
+				   if(codec!=NULL&&is->ViewSurface){
+					     avctx->get_format=mediacodec_GetFormat;
+				         AVMediaCodecContext *mc = av_mediacodec_alloc_context();
+					     mc->surface =is->ViewSurface; 
+						 avctx->hwaccel_context =mc;
+                         /* avctx->hwaccel_context = mc;*/
+                        //int retx=av_mediacodec_default_init(avctx, mc,is->ViewSurface);
+					    //if(retx==AVERROR_EXTERNAL)
+					    // LOGE_KK("mediacodec ViewSurface err %d \n",(int)is->ViewSurface); 
 
-					     mc->surface =is->ViewSurface;
-                    /* avctx->hwaccel_context = mc;*/
-                         avctx->hwaccel_context =mc;
-       //                int retx=av_mediacodec_default_init(avctx, mc,is->ViewSurface);
-					  //if(retx==AVERROR_EXTERNAL)
-					  // LOGE_KK("mediacodec ViewSurface err %d \n",(int)is->ViewSurface); 
-
-					  // LOGE_KK("mediacodec ViewSurface %d \n",(int)is->ViewSurface); 
-					  // LOGE_KK("mc ViewSurface %d \n",(int)mc->surface); 
+					    // LOGE_KK("mediacodec ViewSurface %d \n",(int)is->ViewSurface); 
+					    // LOGE_KK("mc ViewSurface %d \n",(int)mc->surface); 
 
 					   ///pix_fmt = ff_get_format(avctx, pix_fmts); 不知道为啥没有返回 AV_PIX_FMT_MEDIACODEC；，修改一下ffmpeg的源码看看，行不行。
-					   char abcd[64]="";
-						snprintf(abcd,64,"%d",AV_PIX_FMT_MEDIACODEC);
-						av_dict_set(&opts, "pixel_format",abcd,0);
+					   // char abcd[64]="";
+						//snprintf(abcd,64,"%d",AV_PIX_FMT_MEDIACODEC);
+						//av_dict_set(&opts, "pixel_format",abcd,0);
                       
 				   }else{
 				       LOGE_KK("mediacodec no find\n");  
 				   }
 			   }else{
-			      LOGE_KK("mediacodec no\n"); 
+			      LOGE_KK("ffcodec \n"); 
 			   }
 	      
        #endif
 			   //av_get_format
 	   if(codec==NULL){
-		   
+		  
 	        codec = avcodec_find_decoder(avctx->codec_id);
 			is->Hard_Code=SKK_VideoState::HARD_CODE_NONE;
 	   }
 	}
-
+    // LOGE_KK("codec %d\n",codec);
 
 	if (avctx->codec_type == AVMEDIA_TYPE_AUDIO)
             av_dict_set(&opts, "refcounted_frames", "1", 0);
@@ -1050,10 +1049,11 @@ int stream_component_open(SKK_VideoState *is, int stream_index)
 		//失败
 		assert(0);
 	}else{
-#ifndef WIN32
-		if(avctx->codec_type == AVMEDIA_TYPE_VIDEO){
-	       AVMediaCodecContext *mc=(AVMediaCodecContext *)avctx->hwaccel_context;
-           LOGE_KK("mc ViewSurface %d \n",(int)mc->surface); 
+#ifdef Android_Plat
+		if(avctx->codec_type == AVMEDIA_TYPE_VIDEO&&is->Hard_Code==SKK_VideoState::HARD_CODE_MEDIACODEC){
+	        AVMediaCodecContext *mc=(AVMediaCodecContext *)avctx->hwaccel_context;
+			if(mc)
+            LOGE_KK("mc ViewSurface %d \n",(int)mc->surface); 
 		}
 #endif
 	}
@@ -1498,15 +1498,17 @@ int queue_picture(SKK_VideoState *is, AVFrame *pFrame, double pts,double duratio
 			    is->IRender->renderUnLock();
 			 }
 		}else
-#endif/**/
-		if(pOutAV->format==AV_PIX_FMT_MEDIACODEC){///Android硬解码格式
+#elif Android_Plat
+        if(pOutAV->format==AV_PIX_FMT_MEDIACODEC){///Android硬解码格式
 			   vp->picformat=AV_PIX_FMT_MEDIACODEC;
 		       AVMediaCodecBuffer* mcbufeer =(AVMediaCodecBuffer*)pOutAV->data[3];
-			    LOGE_KK("dex AV_PIX_FMT_MEDIACODE mcbufeer=%d \n",mcbufeer);
-			   int xxxx=av_mediacodec_release_buffer(mcbufeer,1);
+			   //LOGE_KK("dex AV_PIX_FMT_MEDIACODE mcbufeer=%d \n",mcbufeer);
+			   av_mediacodec_release_buffer(mcbufeer,1);
 			   //MediaCodecDecContext* mctx==mcbufeer->ctx;
-			  LOGE_KK("dex AV_PIX_FMT_MEDIACODE %d\n",xxxx);
-		}else if(is->DstAVff!=format&&is->Hard_Code!=SKK_VideoState::HARD_CODE_QSV&&format!=AV_PIX_FMT_NV12||copydata)
+			 // LOGE_KK("dex AV_PIX_FMT_MEDIACODE %d\n",xxxx);
+		}else 
+#endif
+		if(is->DstAVff!=format&&is->Hard_Code!=SKK_VideoState::HARD_CODE_QSV&&format!=AV_PIX_FMT_NV12||copydata)
 		{
 			
 			is->img_convert_ctx = sws_getCachedContext(is->img_convert_ctx,

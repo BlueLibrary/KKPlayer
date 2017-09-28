@@ -222,7 +222,7 @@ void  GlEs2Render::SetKeepRatio(int KeepRatio)
 void GlEs2Render::GLES2_Renderer_reset()
 {
 	///gl view
-	///软件使用的代码块
+	///软解码使用
 	{
 			if (m_vertexShader) {
 				glDeleteShader(m_vertexShader);
@@ -233,10 +233,7 @@ void GlEs2Render::GLES2_Renderer_reset()
 				m_fragmentShader=0;
 			}
 
-			if (g_glProgram){
-				glDeleteProgram(g_glProgram);
-				g_glProgram=0;
-			}
+			
 
 
 			for (int i = 0; i < 3; ++i) {
@@ -245,9 +242,14 @@ void GlEs2Render::GLES2_Renderer_reset()
 					m_plane_textures[i]=0;
 				}
 			}
-			
-			
-			//GLuint g_glSurfaceProgram;
+			if (g_glProgram){
+				glDeleteProgram(g_glProgram);
+				g_glProgram=0;
+			}
+	}
+	///硬解码使用
+	{	
+	   //GLuint g_glSurfaceProgram;
 		if (m_vertexShaderSurfaceTexture){
 			glDeleteShader(m_vertexShaderSurfaceTexture);
 			m_vertexShaderSurfaceTexture=0;
@@ -256,30 +258,19 @@ void GlEs2Render::GLES2_Renderer_reset()
 				glDeleteShader(m_fragmentShaderSurfaceTexture);
 				m_fragmentShader=0;
 		}
+	
+		if(g_SurfaceTextVId!=0)
+		    glDeleteTextures(1, &g_SurfaceTextVId);
+		
 		if (g_glSurfaceProgram){
 			 glDeleteProgram(g_glSurfaceProgram);
 			 g_glSurfaceProgram=0;
 		}
-		if(g_SurfaceTextVId!=0)
-		    glDeleteTextures(1, &g_SurfaceTextVId);
-		m_bAvPicLoaded=0;
 	}
-	
-	///硬件使用的代码块
-	{
-		  glDeleteTextures(1, &m_texture_ParamHandle);
-		  m_texture_ParamHandle=0;
-			
-		  glDeleteTextures(1, &m_texture_positionHandle);
-		  m_texture_positionHandle=0;
-		 
-			
-		  if(g_SurfaceTextVId!=0)
-			glDeleteTextures(1, &g_SurfaceTextVId);/**/
-	}
+	m_bAvPicLoaded=0;
 }
 
-//https://github.com/crossle/MediaPlayerSurface/blob/master/app/src/main/java/me/crossle/demo/surfacetexture/VideoSurfaceView.java
+
 GLuint GlEs2Render::buildProgram(const char* vertexShaderSource,
                            const char* fragmentShaderSource)
 {
@@ -553,6 +544,7 @@ jobject GlEs2Render::SetSurfaceTexture(JNIEnv *env)
     env->DeleteLocalRef( surfaceTextureClass );  /**/
 	
 	GenerateSurface();
+	glUseProgram(0);
 	return javaSurfaceTextureObj;
 }
 jobject  GlEs2Render::GetViewSurface()
@@ -591,23 +583,24 @@ void GlEs2Render::AVTexCoords_cropRight(GLfloat cropRight)
 
 
 
-void GlEs2Render::GlViewRender(bool ReLoad)
+void GlEs2Render::GlViewRender(bool ReLoad,bool bSurfaceDisplay)
 {
     if(g_glProgram==0|| m_vertexShader==0||m_fragmentShader==0){
 		 LOGE("g_glProgram=%d m_vertexShader=%d||m_fragmentShader=%d \n", g_glProgram,m_vertexShader,m_fragmentShader);
          return;
-	}
+	} 
+	//LOGE_KK("GlViewRender \n");
 	glClear(GL_COLOR_BUFFER_BIT);
-	m_UsedViewSurfaceed=1;
+	if(bSurfaceDisplay)
+	   m_UsedViewSurfaceed=1;
+   else
+	   m_UsedViewSurfaceed=0;
 	if(m_UsedViewSurfaceed)
 	   glUseProgram(g_glSurfaceProgram);
     else{
 	   glUseProgram(g_glProgram);
     }
-	if(m_penv){
-	     m_penv->CallVoidMethod(javaSurfaceTextureObj, updateTexImageMethodId);
-		 LOGE("javaSurfaceTextureObj updateTexImageMethodId \n", m_nKeepRatio);
-	}
+	  
    /* if(m_bfameAvailable&&m_penv&&javaSurfaceTextureObj){
 	  m_penv->CallVoidMethod(javaSurfaceTextureObj, updateTexImageMethodId);
 	}*/
@@ -620,7 +613,7 @@ void GlEs2Render::GlViewRender(bool ReLoad)
         float height    = m_Picheight;
 		m_nLastKeepRatio=m_nKeepRatio;
 		
-		if(m_penv){
+		if(m_penv&&bSurfaceDisplay){
 		   m_penv->CallVoidMethod(javaSurfaceTextureObj, setDefaultBufferSizeMethodId, m_Picwidth,m_Picheight);
 		}
 		if(m_nKeepRatio==2){
@@ -703,7 +696,8 @@ void GlEs2Render::GlViewRender(bool ReLoad)
        m_pPlayer->RenderImage(this, false); 
 	} 
 	if(m_bAvPicLoaded==0)
-		glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
+		//glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
+	    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	else{
 			 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
@@ -736,7 +730,7 @@ void GlEs2Render::resize(unsigned int w, unsigned int h)
 }
 void GlEs2Render::render(kkAVPicInfo *Picinfo,bool wait)
 {
-	LOGE("Picinfo %d ",Picinfo);
+	//LOGE("Picinfo %d ",Picinfo);
     if(Picinfo!=NULL&&Picinfo->width!=0&&Picinfo->height!=0)
     {
 		
@@ -748,7 +742,7 @@ void GlEs2Render::render(kkAVPicInfo *Picinfo,bool wait)
 					m_bAdJust=false;
 					
 				}
-				LOGI("MEDIACODEC 22-- %d  %d \n",(int)AV_PIX_FMT_MEDIACODEC, Picinfo->picformat);
+				//LOGI("MEDIACODEC 22-- %d  %d \n",(int)AV_PIX_FMT_MEDIACODEC, Picinfo->picformat);
                 
 				if(m_UsedViewSurfaceed){
 		              glActiveTexture(GL_TEXTURE0) ;
@@ -762,8 +756,8 @@ void GlEs2Render::render(kkAVPicInfo *Picinfo,bool wait)
 			          KK_GLES2_loadOrtho(&modelViewProj, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
 			          glUniformMatrix4fv(m_texture_TranformHandle, 1, GL_FALSE, modelViewProj.m);
 			
-                }else{
-					//Picinfo->picformat!=(int)AV_PIX_FMT_MEDIACODEC
+                }else if(Picinfo->picformat!=(int)AV_PIX_FMT_MEDIACODEC){
+					//
 					int     planes[3]    = { 0, 1, 2 };
 					const GLsizei widths[3]    = { Picinfo->linesize[0], Picinfo->linesize[1], Picinfo->linesize[2] };
 				   // const GLsizei widths[3]    = { Picinfo->width, Picinfo->width/2, Picinfo->width/2};

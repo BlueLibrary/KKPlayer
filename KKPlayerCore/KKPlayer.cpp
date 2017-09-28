@@ -80,6 +80,11 @@ void  KKPlayer::SetViewSurface(void* surface)
    m_pViewSurface=surface;
    LOGE_KK("ViewSurface= %d \n",(int)surface);  
 }
+bool KKPlayer::IsMediacodecSurfaceDisplay()
+{
+	return m_bSurfaceDisplay;
+    
+}
 #endif
 std::list<KKPluginInfo>  KKPlayer::KKPluginInfoList;
 void KKPlayer::AddKKPluginInfo(KKPluginInfo& info)
@@ -127,6 +132,7 @@ KKPlayer::KKPlayer(IKKPlayUI* pPlayUI,IKKAudio* pSound):m_pSound(pSound),m_pPlay
 #ifdef Android_Plat
 	m_pVideoRefreshJNIEnv=NULL;
 	m_pViewSurface=0;
+	m_bSurfaceDisplay=0;
 #endif
 #ifdef PRINT_CODEC_INFO
 	AVInputFormat *ff=av_iformat_next(NULL);
@@ -454,6 +460,8 @@ void KKPlayer::CloseMedia()
 
 	#ifdef Android_Plat
 	    m_pVideoRefreshJNIEnv=NULL;
+		 m_bSurfaceDisplay=false;
+		 m_pViewSurface=0;
     #endif
 	LOGE_KK("KKplay Over\n");
 }
@@ -987,10 +995,9 @@ void KKPlayer::RenderImage(IkkRender *pRender,bool Force)
 													   vp =frame_queue_peek_last(&pVideoInfo->pictq);  
 													   m_lstPts=vp->pts;
 													   static int iddd=0;
-													   /*if(vp->serial<iddd)
-														   assert(0);*/
+													    LOGE_KK("RenderImage \n");
 													   iddd=vp->serial;
-													   if(vp->Bmp.data[0]!=NULL&&(m_lstPts!=vp->pts||Force)||AV_PIX_FMT_MEDIACODEC)
+													   if(vp&&vp->Bmp.data[0]!=NULL&&(m_lstPts!=vp->pts||Force)||vp->picformat==AV_PIX_FMT_MEDIACODEC)
 													   {
 														   if(vp->picformat==(int)AV_PIX_FMT_MEDIACODEC){
 														   
@@ -1016,7 +1023,6 @@ void KKPlayer::RenderImage(IkkRender *pRender,bool Force)
 														   }
 													   }else if(pVideoInfo->IsReady==0){
 														   pRender->render(NULL,true);
-														      LOGE_KK("render(NULL,true)\n");
 													   }
 													   pVideoInfo->pictq.mutex->Unlock();
 													}else if(pVideoInfo->audio_st!=NULL&&pVideoInfo->iformat!=NULL){
@@ -2115,6 +2121,12 @@ void KKPlayer::ReadAV()
 		LOGE_KK("AVMEDIA_TYPE_SUBTITLE \n");
 		stream_component_open(pVideoInfo, st_index[AVMEDIA_TYPE_SUBTITLE]);
 	}
+#ifdef Android_Plat
+	if(pVideoInfo&&pVideoInfo->Hard_Code==SKK_VideoState::HARD_CODE_MEDIACODEC&&m_pViewSurface)
+	{
+	    m_bSurfaceDisplay=true;
+	}
+#endif
 
 	if(pVideoInfo->iformat==NULL)
 	{
