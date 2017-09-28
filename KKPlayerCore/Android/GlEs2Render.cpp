@@ -40,7 +40,7 @@ static const char G_VERTEX_shader[] =
         "} \n";
 		
 static const char GSurfaceVertexShader[] =
-        "attribute vec4 aPosition;\n"
+                "attribute vec4 aPosition;\n"
                 "attribute vec4 aTexCoordinate;\n"
                 "uniform mat4 texTransform;\n"
                 "varying vec2 v_TexCoordinate;\n"
@@ -463,64 +463,6 @@ int GlEs2Render::IniGl()
 		m_texture_positionHandle = glGetAttribLocation(g_glSurfaceProgram, "aPosition");
 		m_texture_CoordHandle = glGetAttribLocation(g_glSurfaceProgram, "aTexCoordinate");
 		m_texture_TranformHandle = glGetUniformLocation(g_glSurfaceProgram, "texTransform");
-	
-
-		   /* struct Vertices
-			{
-				float positions[4][4];
-				float texCoords[4][4];
-			};
-
-			const float x = 0.5f;
-			const float y = 0.5f;
-			const float z = -1.0f;
-
-			static const Vertices vertices =
-			{
-				// positions
-				{
-					-x,    y,    z,
-					-x,   -y,    z,
-					 x,   -y,    z,
-					 x,    y,    z
-				},
-				// texCoords
-				{
-					 0.0f, 1.0f, 0.0f, 1.0f,
-					 0.0f, 0.0f, 0.0f, 1.0f,
-					 1.0f, 0.0f, 0.0f, 1.0f,
-					 1.0f, 1.0f, 0.0f, 1.0f
-				},
-			};
-
-			static const unsigned short indices[] = {
-			  0, 1, 2,  0, 2 ,3
-			};
-
-			 glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ib );
-			
-			 glGenVertexArraysOES( 1, &vao );
-             glBindVertexArrayOES( vao );
-
-			 glGenBuffers( 1, &vb );
-			 glBindBuffer( GL_ARRAY_BUFFER, vb );
-			 glBufferData( GL_ARRAY_BUFFER, sizeof( vertices ), &vertices, GL_STATIC_DRAW );
-
-			 glGenBuffers( 1, &ib ) ;
-			 glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ib );
-			 glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices ), indices, GL_STATIC_DRAW );
-
-
-			glEnableVertexAttribArray ( m_texture_positionHandle  );
-			glVertexAttribPointer ( m_texture_positionHandle , 3, GL_FLOAT, false, 0, (const GLvoid *)offsetof( Vertices, positions ));
-
-			glEnableVertexAttribArray ( m_texture_CoordHandle );
-			glVertexAttribPointer ( m_texture_CoordHandle, 4, GL_FLOAT, false, 0, (const GLvoid *)offsetof( Vertices, texCoords ));
-
-            glBindVertexArrayOES( 0 );
-			glDisableVertexAttribArray( m_texture_positionHandle  ) ;
-			glDisableVertexAttribArray( m_texture_CoordHandle );
-*/			
 	}
    
     return m_pGLHandle;
@@ -651,15 +593,17 @@ void GlEs2Render::AVTexCoords_cropRight(GLfloat cropRight)
 
 void GlEs2Render::GlViewRender(bool ReLoad)
 {
-	 //return;
-    if(g_glProgram==0|| m_vertexShader==0||m_fragmentShader==0)
-	{
+    if(g_glProgram==0|| m_vertexShader==0||m_fragmentShader==0){
 		 LOGE("g_glProgram=%d m_vertexShader=%d||m_fragmentShader=%d \n", g_glProgram,m_vertexShader,m_fragmentShader);
          return;
 	}
+	glClear(GL_COLOR_BUFFER_BIT);
 	m_UsedViewSurfaceed=1;
 	if(m_UsedViewSurfaceed)
 	   glUseProgram(g_glSurfaceProgram);
+    else{
+	   glUseProgram(g_glProgram);
+    }
 	if(m_penv){
 	     m_penv->CallVoidMethod(javaSurfaceTextureObj, updateTexImageMethodId);
 		 LOGE("javaSurfaceTextureObj updateTexImageMethodId \n", m_nKeepRatio);
@@ -667,7 +611,7 @@ void GlEs2Render::GlViewRender(bool ReLoad)
    /* if(m_bfameAvailable&&m_penv&&javaSurfaceTextureObj){
 	  m_penv->CallVoidMethod(javaSurfaceTextureObj, updateTexImageMethodId);
 	}*/
-	glClear(GL_COLOR_BUFFER_BIT);
+	
 	//glUseProgram(g_glProgram);
 	
     if(!m_bAdJust&&m_Picwidth!=0&& m_Picheight!=0||m_nKeepRatio!=m_nLastKeepRatio)
@@ -745,9 +689,6 @@ void GlEs2Render::GlViewRender(bool ReLoad)
 			 AVTexCoords_reset();
              AVTexCoords_cropRight(0);
 			 AVTexCoords_reloadVertex(m_texture_CoordHandle,m_AVTexcoords);
-			 
-		/**/
-	
 		}else{
 			 AVVertices_reloadVertex(g_av4_position, m_AVVertices);
              AVTexCoords_reset();
@@ -759,20 +700,13 @@ void GlEs2Render::GlViewRender(bool ReLoad)
     }
 
 	if(ReLoad){
-		
        m_pPlayer->RenderImage(this, false); 
-	  
 	} 
 	if(m_bAvPicLoaded==0)
 		glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
-	else  /*if(m_UsedViewSurfaceed){
-		     glBindVertexArrayOES(vao);
-	         glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void *)0);
-		}else*/
-		{
-			
+	else{
 			 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		}
+	}
     checkGlError("glDrawArrays");
 	//glUseProgram(0);
     if(m_Picwidth==0|| m_Picheight==0)
@@ -822,7 +756,12 @@ void GlEs2Render::render(kkAVPicInfo *Picinfo,bool wait)
 					  LOGI("MEDIACODEC  render\n");
 					  glUniform1i(m_texture_ParamHandle, 0);
 
-                      glUniformMatrix4fv(m_texture_TranformHandle, 1, GL_FALSE, texTransform);
+                      //glUniformMatrix4fv(m_texture_TranformHandle, 1, GL_FALSE, texTransform);
+					  
+					  KK_GLES_Matrix modelViewProj;
+			          KK_GLES2_loadOrtho(&modelViewProj, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+			          glUniformMatrix4fv(m_texture_TranformHandle, 1, GL_FALSE, modelViewProj.m);
+			
                 }else{
 					//Picinfo->picformat!=(int)AV_PIX_FMT_MEDIACODEC
 					int     planes[3]    = { 0, 1, 2 };

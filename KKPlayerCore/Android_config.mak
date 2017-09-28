@@ -1,8 +1,8 @@
 ifndef KKPlayer_CONFIG_MAK
 FFMPEG_CONFIG_MAK=1
 #此处需要修改
-#NDK_PATH=D:/ProgramFiles/Android/Androidsdk/ndk-bundle
-NDK_PATH=E:/android/android-sdk-windows/ndk-bundle
+NDK_PATH=D:/ProgramFiles/Android/Androidsdk/ndk-bundle
+#NDK_PATH=E:/android/android-sdk-windows/ndk-bundle
 
 FFMPEGLib=../ffmpeg/arm/armv7
 FFMPEGINCLUDE=../ffmpeg/include
