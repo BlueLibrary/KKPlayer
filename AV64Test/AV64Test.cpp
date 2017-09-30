@@ -188,14 +188,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case  WM_CREATE:
 		{
 		     // 
+			{
+			   pAv=  new  CKKPlayer();
+			   RECT rt={0,100,200,300};
+			  int kstyle=WS_CHILDWINDOW | WS_CLIPCHILDREN| WS_CLIPSIBLINGS|WS_VISIBLE;
+		       HWND hw = pAv->CreateKKPlayer(hWnd,rt,kstyle, 1);
+			  //  pAv->CreateDuiRawKKPlayer(hWnd,30,RenderImgCall,0);
+				 int ii= pAv->OpenMedia("rtmp://live.hkstv.hk.lxdns.com/live/hks");
+			  ::ShowWindow(hw,SW_SHOW);
+			}
 
-			  pAv=  new  CKKPlayer();
-			  // RECT rt={0,100,200,300};
-			  // int kstyle=WS_CHILDWINDOW | WS_CLIPCHILDREN| WS_CLIPSIBLINGS|WS_VISIBLE;
-		   //   // HWND hw = pAv->CreateKKPlayer(hWnd,rt,kstyle, 1);
-			     pAv->CreateDuiRawKKPlayer(hWnd,30,RenderImgCall,0);
-				 int ii= pAv->OpenMedia("librtmp:rtmp://live.hkstv.hk.lxdns.com/live/hks");
-			  // ::ShowWindow(hw,SW_SHOW);
+			{
+			  CKKPlayer* pAv2=  new  CKKPlayer();
+			   RECT rt={0,100,400,700};
+			  int kstyle=WS_CHILDWINDOW | WS_CLIPCHILDREN| WS_CLIPSIBLINGS|WS_VISIBLE;
+		       HWND hw = pAv2->CreateKKPlayer(hWnd,rt,kstyle, 1);
+			  //  pAv->CreateDuiRawKKPlayer(hWnd,30,RenderImgCall,0);
+				 int ii= pAv2->OpenMedia("D:/avseg/1±ùÑ©ÆæÔµÆ¬¶Ï.flv");
+			  ::ShowWindow(hw,SW_SHOW);
+			}
 		}
 		break;
 	default:

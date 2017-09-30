@@ -1,3 +1,4 @@
+webrtc²©¿Í£¬http://www.cnblogs.com/Leo_wl/p/5706038.html
 I am using one Shadowsocks proxy in China because of the GFW.  
 The following is my complete setting :
 (1)  Set Shadowsockes as global proxy mode;
