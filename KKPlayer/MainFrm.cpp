@@ -776,6 +776,7 @@ LRESULT           CMainFrame::OnLbuttonDown(UINT uMsg/**/, WPARAM wParam/**/, LP
 	//::PostMessage(m_hWnd ,WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(xPos, yPos)); 
 #ifndef LIBKKPLAYER
 	HWND P=::GetParent(m_hWnd);
+	if(!m_bFullScreen)
 	::PostMessage(P ,WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(xPos, yPos)); 
     ::SendMessage(P,WM_UI_LBUTTONDOWN,wParam,lParam);
 	
