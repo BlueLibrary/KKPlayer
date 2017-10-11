@@ -891,7 +891,8 @@ unsigned char*    CMainFrame::GetErrImage(int &length,int ErrType)
 {
 	if(m_pErrOpenImage==NULL)
 	{
-		std::string basePath="";//GetModulePathA();
+		CWinDir dir;
+		std::string basePath=dir.GetModulePathA();
 		FILE*fp=NULL;
 		std::string PicPath=basePath;
 		PicPath+="\\Skin\\ErrOpen.png";
@@ -1003,7 +1004,7 @@ unsigned char*    CMainFrame::GetBkImage(int &len)
 }
 
 
-int               CMainFrame:: PreOpenUrlCallForSeg(char *InOutUrl,int *AvIsSeg,int *Interrupt)
+int        CMainFrame:: PreOpenUrlCallForSeg(char *InOutUrl,int *AvIsSeg,int *Interrupt)
 {
 	int ret=0;
 	std::list<KKPluginInfo>& listx=KKPlayer::GetKKPluginInfoList();
@@ -1076,7 +1077,7 @@ int               CMainFrame:: PreOpenUrlCallForSeg(char *InOutUrl,int *AvIsSeg,
 	}
     return ret;
 }
-void              CMainFrame::OpenMediaStateNotify(char* strURL,EKKPlayerErr err)
+void       CMainFrame::OpenMediaStateNotify(char* strURL,EKKPlayerErr err)
 {
      int length=0;
 	 unsigned char* img=GetErrImage(length,0);

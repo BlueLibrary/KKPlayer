@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menuRoot  itemHeight="26" iconPos="4,4" 
+textOffset="5" iconBarWidth="24" maxWidth="180" minWidth="170" 
+translucent="1"
+margin="0,0,0,0" colorBkgnd="#ff0000">
+  <menuItem id="110" >播放</menuItem>
+  <menuItem id="111" >删除</menuItem>
+  <menuItem id="112" >排序
+     <menuItem id="113" >升序</menuItem>
+     <menuItem id="114" >降序</menuItem>
+  </menuItem>
+  <menuItem id="115" >打开文件位置</menuItem>
+  
+</menuRoot>

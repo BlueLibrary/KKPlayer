@@ -22,6 +22,7 @@
 	<SMENUEX>
              <file name="avmenuex" path="xml\AVMenu.xml"/>
 			 <file name="avsettingmenuex" path="xml\AvSettingMenu.xml"/>
+			 <file name="avhismenuex" path="xml\AVHisMenu.xml" />
     </SMENUEX>
 	<ICON>
 		<file name="ICON_LOGO"  path="image\KKPlayer.ico"    />

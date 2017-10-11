@@ -17,7 +17,8 @@ namespace SOUI
 				CHistoryAdapterFix();
 				~CHistoryAdapterFix();
 				int          getCount();
-				bool         OnButtonClick(EventArgs *pEvt);
+				///ÓÒ¼üÊÂ¼þ
+				bool         OnRClick(EventArgs *pEvt);
 				void         getView(int position, SWindow * pItem,pugi::xml_node xmlTemplate);
 				bool         OnCbxSelChange(EventArgs *pEvt);
 	public:

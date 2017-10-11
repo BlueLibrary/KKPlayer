@@ -18,10 +18,7 @@ namespace SOUI
 	{
 		return m_slQue.size();
 	}
-	bool         CHistoryAdapterFix::OnButtonClick(EventArgs *pEvt)
-	{
-	   return true;
-	}
+	
 	void         CHistoryAdapterFix::getView(int position, SWindow * pItem,pugi::xml_node xmlTemplate)
 	{
 	    AV_Hos_Info * pAVPic=m_slQue.at(position);
@@ -34,6 +31,7 @@ namespace SOUI
 		SItemPanel * pSItme=(SItemPanel *)pItem;
 		pSItme->SetUserData((ULONG_PTR)pAVPic);
 		pSItme->GetEventSet()->subscribeEvent(EVT_ITEMPANEL_DBCLICK,Subscriber(&CHistoryAdapterFix::OnCbxSelChange,this));
+		pSItme->GetEventSet()->subscribeEvent(EVT_ITEMPANEL_RCLICK,Subscriber(&CHistoryAdapterFix::OnRClick,this));
 		SImageWnd  *pAV_img= pItem->FindChildByName2<SImageWnd>(L"AV_img");
 		int picw=0,pich=0;
 		std::map<int,IBitmap*>::iterator _It=m_BitMap.find(position);
@@ -197,9 +195,37 @@ namespace SOUI
 		SStatic *pAV_Time= pItem->FindChildByName2<SStatic>(L"AV_Time");
 		pAV_Time->SetWindowText(CurTimeStr.c_str());
 	}
+
+	bool         CHistoryAdapterFix::OnRClick(EventArgs *pEvt)
+	{
+
+		SItemPanel * pSItme=(SItemPanel *)pEvt->sender;
+		if(pSItme)
+		{
+			CRect rt=	pSItme->GetClientRect();
+			
+
+			POINT point;
+			GetCursorPos(&point);
+			int xPos=point.x;
+			int yPos=point.y;
+
+			/*GetWindowRect(pSItme->GetHostHwnd(),&rt);
+			xPos+=rt.left;
+			yPos+=rt.top;*/
+			SOUI::SMenuEx me;
+			BOOL xx=me.LoadMenu(_T("SMENUEX:avhismenuex"));
+			me.TrackPopupMenu(0,xPos,yPos,pSItme->GetHostHwnd());
+		}
+	   return true;
+	}
 	bool         CHistoryAdapterFix::OnCbxSelChange(EventArgs *pEvt)
 	{
-	     return true;
+		SItemPanel * pSItme=(SItemPanel *)pEvt->sender;
+		AV_Hos_Info * pAVPic =(AV_Hos_Info *)pSItme->GetUserData();
+
+		::SendMessageA(pSItme->GetHostHwnd(),WM_UI_AVLIST_OPEN,(WPARAM)pAVPic->url,0);
+	    return true;
 	}
 	void         CHistoryAdapterFix::UpdateData()
 	{
