@@ -250,6 +250,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\version.h"
+				>
+			</File>
+			<File
 				RelativePath=".\WHRoundRectFrameHelper.h"
 				>
 			</File>

@@ -34,7 +34,8 @@ public:
 		 void InitDb();
 		 /*******播放进度更新信息***********/
 		 void UpDataAVinfo(const char *strpath,int curtime,int totaltime,unsigned char* Imgbuf,int buflen,int width,int height);
-       
+		 ///
+         void DelAVinfo(const char *strpath);
 		 //更新传送信息
 		 void UpdateTransferInfo(char *urlInfo,char* alias,char *category,unsigned int FileSize,unsigned int AcSize,int Speed);
 

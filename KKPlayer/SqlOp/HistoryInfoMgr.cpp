@@ -171,6 +171,24 @@ void CHistoryInfoMgr::UpDataAVinfo(const char *strpath,int curtime,int totaltime
 	m_Lock.Unlock();
     sqlite3_finalize(pStmt);
 }    
+void CHistoryInfoMgr::DelAVinfo(const char *strpath)
+{
+    sqlite3* pDb=( sqlite3* )m_pDb;
+	sqlite3_stmt *pStmt = 0;  
+
+	
+    char *str="delete from AVHisinfo where url=\"%s\")";
+	
+
+	char strsql[512]="";
+	sprintf(strsql,str,strpath);
+
+	
+	m_Lock.Lock();
+	SqliteOp.NoSelectSql(pDb,strsql);
+	m_Lock.Unlock();
+    sqlite3_finalize(pStmt);
+}
 //获取放播的历史信息
 void CHistoryInfoMgr::GetAVHistoryInfo(std::vector<AV_Hos_Info *> &slQue)
 {

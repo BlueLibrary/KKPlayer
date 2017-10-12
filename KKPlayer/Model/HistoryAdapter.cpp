@@ -1,6 +1,8 @@
+#include "../ui.h"
 #include "HistoryAdapter.h"
 #include "../Tool/cchinesecode.h"
 #include "../SqlOp/HistoryInfoMgr.h"
+
 extern SOUI::CAutoRefPtr<SOUI::IRenderFactory> pRenderFactory;
 namespace SOUI
 {
@@ -203,7 +205,8 @@ namespace SOUI
 		if(pSItme)
 		{
 			CRect rt=	pSItme->GetClientRect();
-			
+			AV_Hos_Info * pAVPic =(AV_Hos_Info *)pSItme->GetUserData();
+			g_stravhisurl=pAVPic->url;
 
 			POINT point;
 			GetCursorPos(&point);

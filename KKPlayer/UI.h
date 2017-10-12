@@ -11,6 +11,7 @@
 #include <unknown/obj-ref-impl.hpp>
 #include <unknown/obj-ref-i.h>
 #include <interface/SResProvider-i.h>
+#include <string>
 #include "resource.h"
 
 using namespace SOUI;
@@ -19,4 +20,6 @@ using namespace SOUI;
 #define WM_UI_LBUTTONDOWN    WM_USER+102
 #define WM_UI_SetAvTilte     WM_USER+103
 #define WM_UI_AVLIST_OPEN    WM_USER+104
+
+extern std::string g_stravhisurl;
 #endif

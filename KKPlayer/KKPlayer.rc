@@ -1,7 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
-
+#include "version.h"
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -91,12 +91,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "柒赢云生态技术www.70ic.com"
             VALUE "FileDescription", "KK影音"
-            VALUE "FileVersion", "1, 0, 9, 1"
+            VALUE "FileVersion", KK_Version
             VALUE "InternalName", "KKPlayer"
             VALUE "LegalCopyright", "Copyright (C) 2017"
             VALUE "OriginalFilename", "KKPlayer.exe"
-            VALUE "ProductName", "KKPlayer 应用程序"
-            VALUE "ProductVersion", "1, 0, 9, 1"
+            VALUE "ProductName", "KK影音"
+            VALUE "ProductVersion", KK_Version
         END
     END
     BLOCK "VarFileInfo"
