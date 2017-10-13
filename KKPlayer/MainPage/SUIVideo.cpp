@@ -180,6 +180,7 @@ namespace SOUI
 	}
 	void CSuiVideo::Close()
 	{
+		SaveSnapshoot();
 		if(m_pIKKplayer!=0)
 		     m_pIKKplayer->CloseMedia();
 	}

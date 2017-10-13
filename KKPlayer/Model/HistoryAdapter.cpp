@@ -2,6 +2,7 @@
 #include "HistoryAdapter.h"
 #include "../Tool/cchinesecode.h"
 #include "../SqlOp/HistoryInfoMgr.h"
+#include <algorithm>
 
 extern SOUI::CAutoRefPtr<SOUI::IRenderFactory> pRenderFactory;
 namespace SOUI
@@ -9,6 +10,7 @@ namespace SOUI
 	
 	CHistoryAdapterFix::CHistoryAdapterFix()
 	{
+		    m_nSortOrder=0;
 	        UpdateData();
 	}
 	CHistoryAdapterFix::~CHistoryAdapterFix()
@@ -230,11 +232,29 @@ namespace SOUI
 		::SendMessageA(pSItme->GetHostHwnd(),WM_UI_AVLIST_OPEN,(WPARAM)pAVPic->url,0);
 	    return true;
 	}
+	static bool SortByM1( const AV_Hos_Info *v1, const AV_Hos_Info *v2)//注意：本函数的参数的类型一定要与vector中元素的类型一致  
+	{  
+		return v1->id < v2->id;//升序排列  
+	}  
+    static bool SortByM2( const AV_Hos_Info *v1, const AV_Hos_Info *v2)//注意：本函数的参数的类型一定要与vector中元素的类型一致  
+	{  
+		return v1->id > v2->id;//升序排列  
+	}  
 	void         CHistoryAdapterFix::UpdateData()
 	{
 		         ClearData();
 		         CHistoryInfoMgr* InfoMgr=CHistoryInfoMgr::GetInance();
 		         InfoMgr->GetAVHistoryInfo(m_slQue);
+				 if(m_nSortOrder==0)
+				    std::sort(m_slQue.begin(),m_slQue.end(),SortByM1);
+				 else
+					std::sort(m_slQue.begin(),m_slQue.end(),SortByM2);
+				 notifyDataSetChanged();
+				 
+	}
+	void         CHistoryAdapterFix::SortOrder(int i)
+	{
+	m_nSortOrder=i;
 	}
 	void         CHistoryAdapterFix::ClearData()
 	{

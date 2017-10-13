@@ -15,6 +15,7 @@ typedef struct _AV_Hos_Info{
 	 int height;
 	 int CurTime;
 	 int TotalTime;
+	 int id;
 }AV_Hos_Info;
 
 typedef struct AV_Transfer_Info{

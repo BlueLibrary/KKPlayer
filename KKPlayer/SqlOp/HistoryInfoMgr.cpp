@@ -177,7 +177,7 @@ void CHistoryInfoMgr::DelAVinfo(const char *strpath)
 	sqlite3_stmt *pStmt = 0;  
 
 	
-    char *str="delete from AVHisinfo where url=\"%s\")";
+    char *str="DELETE FROM  AVHisinfo where url=\"%s\"";
 	
 
 	char strsql[512]="";
@@ -195,10 +195,11 @@ void CHistoryInfoMgr::GetAVHistoryInfo(std::vector<AV_Hos_Info *> &slQue)
     sqlite3* pDb=( sqlite3* )m_pDb;
 	sqlite3_stmt *pStmt = 0;
 	m_Lock.Lock();
-	int ret=sqlite3_prepare(pDb, "select * from AVHisinfo", -1, &pStmt, 0);
+	int ret=sqlite3_prepare(pDb, "select * from AVHisinfo ORDER BY rowid DESC;", -1, &pStmt, 0);
 
 	int size=0;
 	int SlLen=sizeof(AV_Hos_Info);
+	int Id=0;
     //int ret=sqlite3_bind_blob(pStmt, 2, buf, 100000, NULL);
 	while(SQLITE_ROW ==sqlite3_step(pStmt))
 	{
@@ -223,7 +224,7 @@ void CHistoryInfoMgr::GetAVHistoryInfo(std::vector<AV_Hos_Info *> &slQue)
 
 		sl->CurTime=sqlite3_column_int(pStmt,index++);
 		sl->TotalTime=sqlite3_column_int(pStmt,index++);
-
+		sl->id=Id++;
 		slQue.push_back(sl);
 
 	}
