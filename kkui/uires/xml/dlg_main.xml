@@ -1,6 +1,6 @@
 <SOUI name="mainWindow" title="KKplayer" 
 width="830" height="500"  margin="5,5,5,5"  resizable="1"
-appWnd="1" minsize="300,200"  bigIcon="ICON_LOGO:32"
+appWnd="1" minsize="400,300"  bigIcon="ICON_LOGO:32"
 translucent="0" 
 >
 	<root skin="_skin.shadow" >
