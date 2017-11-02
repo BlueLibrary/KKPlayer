@@ -250,7 +250,7 @@ namespace SOUI
 		  }
 		  return str;
 	}
-	int CSuiVideo::OpenMedia(const char *str,const char* avname)
+	int CSuiVideo::OpenMedia(const char *str,const char* avname, const char* cmd)
 	{
 		m_nPlayerState=-1;
 		if(m_pIKKplayer==0)

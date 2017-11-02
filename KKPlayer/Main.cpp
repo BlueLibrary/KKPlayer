@@ -17,7 +17,7 @@
 #include "SqlOp/HistoryInfoMgr.h"
 #include <ShellAPI.h>
 
-
+#include "../KKPlayerCore/KKPlayerInfo.h"
 
 void DeclareDumpFile();
 
@@ -29,6 +29,9 @@ void DeclareDumpFile();
 
 CreateRender pfnCreateRender = NULL;
 DelRender    pfnDelRender=NULL;
+
+
+fpKKPlayerGetUrl     pfpGetUrl=NULL;
 //F:\ProgramTool\OpenPro\KKPlayer\KKPlayer>uiresbuilder.exe -iuires/uires.idx -puires -rres/KK_res.rc2
 
 
@@ -199,6 +202,12 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
           pfnCreateRender = (CreateRender)GetProcAddress(hRender, "CreateRender");
 		  pfnDelRender = (DelRender)GetProcAddress(hRender, "DelRender");
 	}
+
+	HMODULE hytburl=LoadLibrary(_T("ytburl.dll"));
+	if(hytburl){
+		    pfpGetUrl=(fpKKPlayerGetUrl )GetProcAddress(hytburl, "GetUrl");
+	}
+
 	SComMgr * pComMgr = new SComMgr;
 
 	

@@ -110,6 +110,7 @@ KKPlayer::KKPlayer(IKKPlayUI* pPlayUI,IKKAudio* pSound):m_pSound(pSound),m_pPlay
 ,m_bOpen(false)
 ,m_nhasVideoAudio(0)
 ,m_DstAVff(AV_PIX_FMT_YUV420P)
+,m_pKKPlayerGetUrl(NULL)
 {
 	
 	static bool registerFF=true;
@@ -551,7 +552,11 @@ void KKPlayer::SetWindowHwnd(HWND hwnd)
 	//m_pSound->SetWindowHAND((int)m_hwnd);
 	
 }
-
+///ÉèÖÃURLÌæ»»º¯Êý
+void           KKPlayer::SetKKPlayerGetUrl(fpKKPlayerGetUrl pKKPlayerGetUrl)
+{
+    m_pKKPlayerGetUrl=pKKPlayerGetUrl;
+}
 unsigned __stdcall  KKPlayer::ReadAV_thread(LPVOID lpParameter)
 {
 	KKPlayer *pPlayer=(KKPlayer *  )lpParameter;
@@ -1906,6 +1911,13 @@ void KKPlayer::ReadAV()
 	int scan_all_pmts_set = 0;
 	pVideoInfo->iformat=NULL;
 	
+	if(m_pKKPlayerGetUrl){
+		char* outstr=0;
+	    err=m_pKKPlayerGetUrl(pVideoInfo->filename,&outstr);
+		if(err==0&&outstr!=0){
+		     strcpy(pVideoInfo->filename,outstr);
+		}
+	}
 
 	pFormatCtx->interrupt_callback.callback =   decode_interrupt_cb;
 	pFormatCtx->interrupt_callback.opaque   =   pVideoInfo;

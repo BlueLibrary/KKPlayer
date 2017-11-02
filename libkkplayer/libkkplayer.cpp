@@ -4,7 +4,7 @@
 #include "../KKPlayer/MainFrm.h"
 CreateRender pfnCreateRender=NULL;
 DelRender pfnDelRender=NULL;
-
+fpKKPlayerGetUrl     pfpGetUrl=NULL;
 
 ////
 void Init(){

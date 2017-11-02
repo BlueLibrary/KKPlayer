@@ -71,6 +71,7 @@ class CMainFrame:public CFrameWindowImpl<CMainFrame>,public ICallKKplayer, publi
 public:
 	CMainFrame(bool yuv420p=true,bool NeedDel=false);
 	~CMainFrame();
+	void           SetKKPlayerGetUrl(fpKKPlayerGetUrl pKKPlayerGetUrl);
 	///设置成无窗口渲染
     void        SetDuiDraw(HWND hAudio,fpRenderImgCall  DuiDrawCall,void* UserData,bool DuiAvRaw=false);
 	int         GetDuiDraw();

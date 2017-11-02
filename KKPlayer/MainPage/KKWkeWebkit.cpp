@@ -6,6 +6,9 @@
 #include "MainDlg.h"
 #include <string>
 
+
+extern SOUI::CMainDlg* G_pCMainDlg;
+///播放器回调函数
 jsValue JS_CALL  FunCallAVPlayer(jsExecState es)
 {
      char *pp=(char*)jsToString(es,jsArg(es,0));
@@ -13,10 +16,10 @@ jsValue JS_CALL  FunCallAVPlayer(jsExecState es)
 	 if(pp!=NULL){
 		 std::string Out="";
 		 CChineseCode::UTF_8ToGBK(Out,pp);
-		 /*if(m_pDlgMain!=NULL){
-			 m_pDlgMain->WinTabShow(1);
-			 m_pDlgMain->OpenMedia((char*)Out.c_str(),name);
-		 }*/
+		 if(G_pCMainDlg!=NULL){
+			 G_pCMainDlg->WinTabShow(1);
+			 G_pCMainDlg->OpenMedia((char*)Out.c_str(),name);
+		 }/**/
 		 
 	 }
 	 	return 0;
@@ -80,7 +83,7 @@ namespace SOUI
             FreeLibrary(m_hModWke);
             return FALSE;
         }
-		jsBindFunction("CallAVPlayer",FunCallAVPlayer,1);
+		jsBindFunction("CallAVPlayer",FunCallAVPlayer,3);
         m_funWkeInit();
 		m_Exit=0;
 		m_hCheckThread=::CreateThread(NULL, 0, UpdateWkeWebViewTh,this , 0, NULL);

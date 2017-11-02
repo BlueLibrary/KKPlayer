@@ -16,7 +16,7 @@ namespace SOUI
 			  CSuiVideo(void);
 			  ~CSuiVideo(void);
 			   void SetAVVisible(BOOL bVisible);
-			   int  OpenMedia(const char *str,const char* avname=NULL);
+			   int  OpenMedia(const char *str,const char* avname=NULL, const char* cmd=NULL);
 			   int  DownMedia(char *KKVURL);
 			   void Close();
 			   void SetPlayStat(int state);

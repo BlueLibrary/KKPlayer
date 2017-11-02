@@ -22,6 +22,7 @@
 #ifndef KKPlayer_H_
 #define KKPlayer_H_
 
+
 class KKPlayer
 {
     public:
@@ -30,7 +31,8 @@ class KKPlayer
 			/******Windows平台调用**********/
 			void          SetWindowHwnd(HWND hwnd);
 
-			
+			///设置URL替换函数
+			void           SetKKPlayerGetUrl(fpKKPlayerGetUrl pKKPlayerGetUrl);
 			///强制中断。
 			void          ForceAbort();
 
@@ -223,7 +225,8 @@ private:
 			void*                           m_pViewSurface;
 			bool                            m_bSurfaceDisplay;
 #endif
-			
+			///用于替换掉原来的url
+		    fpKKPlayerGetUrl                m_pKKPlayerGetUrl;           	
 };
 
 #endif

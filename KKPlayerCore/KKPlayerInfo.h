@@ -48,4 +48,7 @@ typedef struct kkAVPicInfo
 	int      height;
 
 }kkAVPicInfo;
+
+///ÓÃÓÚÌæ»»URL
+typedef int (*fpKKPlayerGetUrl)(char* url,char** outurlstr);
 #endif

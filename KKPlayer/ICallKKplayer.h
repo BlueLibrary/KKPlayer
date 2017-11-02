@@ -4,10 +4,13 @@
 #include <string>
 //errcode ²Î¿¼EKKPlayerErr
 typedef void (*fpKKPlayerErrNotify)(void *UserData,int errcode);
+
 class  ICallKKplayer
 {
 public:
 	    virtual ~ICallKKplayer(){}
+		///ÉèÖÃURLÌæ»»º¯Êý
+	     virtual void        SetKKPlayerGetUrl(fpKKPlayerGetUrl pKKPlayerGetUrl)=0;
 	    virtual int          Pause()=0;
 		virtual int          PktSerial()=0;
 		virtual void         OnDecelerate()=0;

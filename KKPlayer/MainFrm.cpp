@@ -10,7 +10,7 @@
 #include "Tool/cchinesecode.h"
 #include "Tool/CFileMgr.h"
 #endif
-
+extern fpKKPlayerGetUrl     pfpGetUrl;
 extern CreateRender pfnCreateRender;
 extern DelRender pfnDelRender;
 
@@ -212,6 +212,10 @@ CMainFrame::      ~CMainFrame()
 	if(m_pPlayerInstance!=NULL)
 	   delete m_pPlayerInstance;
 
+}
+void  CMainFrame::SetKKPlayerGetUrl(fpKKPlayerGetUrl pKKPlayerGetUrl)
+{
+   m_pPlayerInstance->SetKKPlayerGetUrl(pKKPlayerGetUrl);
 }
 ///设置成无窗口渲染
 void CMainFrame::SetDuiDraw(HWND h,fpRenderImgCall DuiDrawCall,void *RenderUserData,bool DuiAvRaw)
@@ -551,6 +555,9 @@ LRESULT           CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM 
 	m_pSound->SetWindowHAND((int)m_hWnd);
 	m_nPlayerInsCount=1;
 	m_pPlayerInstance = new KKPlayer(this,m_pSound);
+
+	m_pPlayerInstance->SetKKPlayerGetUrl(pfpGetUrl);
+
 	m_pRender=NULL;
 	char Out=1;
 	HWND hh=m_hWnd;

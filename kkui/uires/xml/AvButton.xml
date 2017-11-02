@@ -1,9 +1,9 @@
 ﻿<include>
  <text font="size:10" name="AV_CurTimeTxt" pos="10,10,@100,@20" colorText="#FFFFFF">00:00:00 / 00:00:00</text>
 					  <text font="size:10" name="AV_SpeedTxt" visible="0" pos="[5,10,@120,@20" align="left" colorText="#FFFFFF">0 B/s</text>
-                      <imgbtn  skin="_skin.PLAY" name="AVPlayBtn" pos="|0, |0" 
+                      <imgbtn  skin="_skin.PLAY" name="AVPlayBtn" pos="|-16, |0,@37,@37" 
 					  tip="开始播放或者暂停"
-					  offset="-0.5,-0.5"  focusable="0" width="37" height="37"/>
+					  offset="-0.5,-0.5"  focusable="0" />
 					  <button  skin="_skin.AUDIO2" name="btn_audio" 
 					  pos="]-10,26"
 					  offset="-0.5,-0.5" focusable="0" width="22" height="22">
