@@ -1014,74 +1014,82 @@ unsigned char*    CMainFrame::GetBkImage(int &len)
 int        CMainFrame:: PreOpenUrlCallForSeg(char *InOutUrl,int *AvIsSeg,int *Interrupt)
 {
 	int ret=0;
+	//http
 	std::list<KKPluginInfo>& listx=KKPlayer::GetKKPluginInfoList();
-	std::list<KKPluginInfo>::iterator It=listx.begin();
-	for(;It!=listx.end();++It)
-	{
-	          KKPluginInfo &Info=*It;
-		      if(Info.KKUrlParser!=NULL){
-					  char* strurls=Info.KKUrlParser(InOutUrl,Interrupt);
-					  if(strurls!=NULL){
-						  Json::Reader rd;
-						  Json::Value value;
-						  std::string aacc=strurls;
-						  if(rd.parse(aacc,value)){
+	
+	if(listx.size()>0){
+			std::list<KKPluginInfo>::iterator It=listx.begin();
+			for(;It!=listx.end();++It)
+			{
+					  KKPluginInfo &Info=*It;
+					  if(Info.KKUrlParser!=NULL){
+							  char* strurls=Info.KKUrlParser(InOutUrl,Interrupt);
+							  if(strurls!=NULL){
+								  Json::Reader rd;
+								  Json::Value value;
+								  std::string aacc=strurls;
+								  if(rd.parse(aacc,value)){
 
-							    if(value["Streams"].isNull()){
-									if(!value["url"].isNull()){
-										strcpy(InOutUrl, value["url"].asString().c_str());
-										ret=1;
-									}
-								}else{
-											Json::Value JsonStreams=value["Streams"];
-											ret=1;
-											*AvIsSeg=1;
-											m_FileSegLock.Lock();
-											AVFILE_SEGS_INFO &infos=m_FileInfos;
-											for(int i=0;i<JsonStreams.size();i++){  
-												 for(int j=0;j<JsonStreams[i]["segs"].size();j++){
-														 Json::Value &seg=JsonStreams[i]["segs"][j];
-												       
-														 AVFILE_SEG_ITEM *Seg1= new AVFILE_SEG_ITEM();
-														 Seg1->milliseconds=seg["milliseconds"].asInt();
-														 Seg1->segsize=seg["segsize"].asInt();
-														 Seg1->SegId=j;
-														 std::string rll=seg["url"].asString();
-														 strcpy(Seg1->url,rll.c_str());
-														
-														 infos.FileSize+=Seg1->segsize;
-														 infos.milliseconds+=Seg1->milliseconds;
-														 m_FileInfos.ItemCount++;
-														 if(infos.pCurItem==NULL){
-															infos.pCurItem=Seg1;
-															infos.pItemHead=Seg1;
-															strcpy(InOutUrl,Seg1->url);
-														 }
-
-														 if(infos.pItemHead==NULL){
-															 infos.pItemHead=Seg1;
-														 }
-														 if(infos.pItemTail==NULL){
-															 infos.pItemTail=Seg1;
-														 }else{
-															 infos.pItemTail->next=Seg1;   
-															 Seg1->pre=infos.pItemTail;
-															 infos.pItemTail=Seg1;
-														 }
-
-														
-												 }
-												 break;
+										if(value["Streams"].isNull()){
+											if(!value["url"].isNull()){
+												strcpy(InOutUrl, value["url"].asString().c_str());
+												ret=1;
 											}
-											m_FileSegLock.Unlock();
-								}
-						  }
-			  }
-              if(strurls!=NULL)
-		        Info.KKFree(strurls);
-		   }
-          
+										}else{
+													Json::Value JsonStreams=value["Streams"];
+													ret=1;
+													*AvIsSeg=1;
+													m_FileSegLock.Lock();
+													AVFILE_SEGS_INFO &infos=m_FileInfos;
+													for(int i=0;i<JsonStreams.size();i++){  
+														 for(int j=0;j<JsonStreams[i]["segs"].size();j++){
+																 Json::Value &seg=JsonStreams[i]["segs"][j];
+														       
+																 AVFILE_SEG_ITEM *Seg1= new AVFILE_SEG_ITEM();
+																 Seg1->milliseconds=seg["milliseconds"].asInt();
+																 Seg1->segsize=seg["segsize"].asInt();
+																 Seg1->SegId=j;
+																 std::string rll=seg["url"].asString();
+																 strcpy(Seg1->url,rll.c_str());
+																
+																 infos.FileSize+=Seg1->segsize;
+																 infos.milliseconds+=Seg1->milliseconds;
+																 m_FileInfos.ItemCount++;
+																 if(infos.pCurItem==NULL){
+																	infos.pCurItem=Seg1;
+																	infos.pItemHead=Seg1;
+																	strcpy(InOutUrl,Seg1->url);
+																 }
+
+																 if(infos.pItemHead==NULL){
+																	 infos.pItemHead=Seg1;
+																 }
+																 if(infos.pItemTail==NULL){
+																	 infos.pItemTail=Seg1;
+																 }else{
+																	 infos.pItemTail->next=Seg1;   
+																	 Seg1->pre=infos.pItemTail;
+																	 infos.pItemTail=Seg1;
+																 }
+
+																
+														 }
+														 break;
+													}
+													m_FileSegLock.Unlock();
+										}
+								  }
+					  }
+					  if(strurls!=NULL)
+						Info.KKFree(strurls);
+				   }     
+			}
 	}
+	 
+	if(strncmp("http",InOutUrl,4)==0)
+		 ret=1;
+
+	
     return ret;
 }
 void       CMainFrame::OpenMediaStateNotify(char* strURL,EKKPlayerErr err)
