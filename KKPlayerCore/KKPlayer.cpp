@@ -2563,6 +2563,7 @@ int KKPlayer::KKSeek( SeekEnum en,int value)
 
 int KKPlayer::AVSeek(int value,short segid)
 {
+	m_PktSerial=-1;
 	if(pVideoInfo!=NULL&&m_nPreFile==3&&!pVideoInfo->realtime)
     {
 	   m_nSeekTime=value;
