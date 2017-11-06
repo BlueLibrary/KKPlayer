@@ -102,13 +102,15 @@ public:
 						}
 					}
 					m_wc = wc;
+				
 					pWndProc = m_wc.lpfnWndProc;
 					m_wc.lpszClassName = lpsz;
 					m_wc.lpfnWndProc = proc;
 				}
 				else
 				{
-					m_wc.hCursor = ::LoadCursor(m_bSystemCursor ? NULL : hInst, m_lpszCursorID);
+					m_wc.hCursor = ::LoadCursor(m_bSystemCursor ? NULL : hInst, m_lpszCursorID);	
+					m_wc.style=m_wc.style|CS_DBLCLKS;
 				}
 
 				m_wc.hInstance = hInst;
