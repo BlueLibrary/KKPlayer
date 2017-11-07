@@ -48,6 +48,12 @@ bool KKPlayer::GrabAvPicBGRA(void* buf,int len,int &w,int &h,bool keepscale)
 				{
 				   h= vp->height*w/vp->width;
 				}
+				   int lxx=w*h*4;
+				   if(lxx>len){
+					   pVideoInfo->pictq.mutex->Unlock();
+				     	return Ok;
+				   }
+				
 				AVPixelFormat srcFF=pVideoInfo->DstAVff;
 				SwsContext * imgctx = NULL;
 				imgctx = sws_getCachedContext( imgctx ,
