@@ -786,11 +786,18 @@ LRESULT           CMainFrame::OnLbuttonDown(UINT uMsg/**/, WPARAM wParam/**/, LP
 	if(!m_bFullScreen)
 	::PostMessage(P ,WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(xPos, yPos)); 
     ::SendMessage(P,WM_UI_LBUTTONDOWN,wParam,lParam);
-	
 #endif
+	::DefWindowProc(m_hWnd,WM_LBUTTONDOWN,wParam,lParam);
 	return 1;
 }
+LRESULT   CMainFrame::OnLbuttonDbClk(UINT uMsg/**/, WPARAM wParam/**/, LPARAM lParam/**/, BOOL& bHandled/**/)
+{
+	bHandled=true;
+	HWND P=::GetParent(m_hWnd);
 
+	::PostMessage(P ,WM_COMMAND   , MAKEWORD(3,0), 0); 
+	return 1;
+}
 LRESULT   CMainFrame::OnSetCursor(UINT uMsg/**/, WPARAM wParam/**/, LPARAM lParam/**/, BOOL& bHandled/**/)
 {
       SetMsgHandled(FALSE);
