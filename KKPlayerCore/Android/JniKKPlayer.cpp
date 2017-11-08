@@ -12,6 +12,11 @@ void* ConvertThread(void *param)
 {
 
 }
+JNIEXPORT void JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_SetPlayerNotify(JNIEnv *env, jobject instance,jint obj,jobject notify)
+{
+	
+	
+}
 /***********初始一个KKUI**********/
 JNIEXPORT jint JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_IniKK(JNIEnv *pEv, jobject p, jint Render)
 {

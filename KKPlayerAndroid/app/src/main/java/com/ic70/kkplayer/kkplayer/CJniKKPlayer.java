@@ -39,6 +39,8 @@ public class CJniKKPlayer {
      */
     public native int IniKK(int RenderType);
 
+    ///设置播放器状态通知函数
+    public native void SetIPlayerStateNotify(int obj,IKKPlayerErrNotify notify);
     //检查Gl环境，初始化glview环境
     public native int IniGl(int obj);
 
@@ -112,7 +114,7 @@ public class CJniKKPlayer {
     public native int GetkkMediaInfo(int obj,CkkMediaInfo jInfo);
 
     ///未实现
-    public native int   GetCapImg(int obj,CapImgInfo jInfo);
+   // public native int   GetCapImg(int obj,CapImgInfo jInfo);
 
 }
 //javah -classpath ..\..\..\build\intermediates\classes\debug com.ic70.kkplayer.kkplayer.CJniKKPlayer

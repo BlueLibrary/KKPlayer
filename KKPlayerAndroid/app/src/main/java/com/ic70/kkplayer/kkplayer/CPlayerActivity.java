@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by saint on 2016/4/27.
  * Video UI
  */
-public class CPlayerActivity extends Activity {
+public class CPlayerActivity extends Activity implements IKKPlayerErrNotify {
     //private GLSurfaceView glView;
     private  GLES2_0_SurfaceView glView;
     private CKKPlayerGlRender m_KKPlayer=null;
@@ -227,7 +227,11 @@ public class CPlayerActivity extends Activity {
         };
     };
 
+    public void OpenMediaStateNotify(String url,int err) 
+    {
 
+
+    }
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movielayout);
