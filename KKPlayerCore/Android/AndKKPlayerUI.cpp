@@ -9,6 +9,12 @@
 #define  LOG_TAG    "libgl2jni"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+
+#include "AndPlayerStateNotifyMgr.h"
+
+///状态通知管理器
+extern CAndPlayerStateNotifyMgr  PlayerStateNotifyMgr;
+
 CAndKKPlayerUI::CAndKKPlayerUI(int RenderView):m_player(this,&m_Audio)
 ,m_nRenderType(RenderView),m_playerState(-1)///播放器未启动
 ,m_pRender(0),m_nRefreshPic(0)
@@ -233,7 +239,9 @@ unsigned char* CAndKKPlayerUI::GetBkImage(int &length)
 void CAndKKPlayerUI::OpenMediaStateNotify(char *strURL,EKKPlayerErr err)
 {
     LOGE("Open Err %d \n",m_playerState);
-    m_playerState=(int)err;
+	m_playerState=(int)err;
+	PlayerStateNotifyMgr.PutAState((int)this,(int)err);
+    //
     return;
 }
 int CAndKKPlayerUI::PreOpenUrlCallForSeg(char *InOutUrl,int *AvIsSeg,int *Interrupt)

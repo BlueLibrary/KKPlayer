@@ -5,5 +5,5 @@ package com.ic70.kkplayer.kkplayer;
 
 public interface IKKPlayerErrNotify{
     ///错误回调通知
-    void OpenMediaStateNotify(String url,int err);
+    void OpenMediaStateNotify(int obj,int err);
 }

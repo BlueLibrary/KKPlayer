@@ -1,7 +1,7 @@
 include Android_config.mak
 objects=platforms.o KKLock.o KKMutex.o KKCond_t.o KKInternal.o kkio.o \
 	log.o amf.o parseurl.o hashswf.o rtmp.o libRtmpPlugin.o \
-	KKPlayer.o md5.o FlvEncode.o \
+	KKPlayer.o md5.o FlvEncode.o AndPlayerStateNotifyMgr.o \
 	GlEs2Render.o AndKKAudio.o AndKKPlayerUI.o JniKKPlayer.o
 #ln -fs $(BASELib)/libc.so libc.so.1;
 #SHARE_LIB   :=KKPayerCore.so  
@@ -78,6 +78,8 @@ FlvEncode.o: rtmp/FlvEncode.h rtmp/FlvEncode.cpp
 KKPlayer.o: KKPlayer.cpp KKPlayer.h IKKAudio.h render/render.h KKLock.h KKVideoInfo.h KKInternal.h rtmp/SrsRtmpPlugin.h
 	$(CXX) -c $(CFLAGS) KKPlayer.cpp
 
+AndPlayerStateNotifyMgr.o: Android/AndPlayerStateNotifyMgr.h Android/AndPlayerStateNotifyMgr.cpp
+	$(CXX) -c $(CFLAGS) Android/AndPlayerStateNotifyMgr.cpp
 AndKKAudio.o: Android/AndKKAudio.cpp Android/AndKKAudio.h KKCond_t.h KKLock.h IKKAudio.h
 	$(CXX) -c $(CFLAGS) Android/AndKKAudio.cpp
 GlEs2Render.o: Android/GlEs2Render.h KKCond_t.h KKLock.h IKKAudio.h Android/GlEs2Render.cpp 

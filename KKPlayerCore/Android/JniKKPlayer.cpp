@@ -4,18 +4,23 @@
 #include <string>
 #include <stdlib.h>
 #include <malloc.h>
-
+#include "AndPlayerStateNotifyMgr.h"
 #include "AndKKPlayerUI.h"
 #include <map>
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+
+///状态通知管理器
+CAndPlayerStateNotifyMgr  PlayerStateNotifyMgr;
 void* ConvertThread(void *param)
 {
 
 }
+
+///播放器状态通知
 JNIEXPORT void JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_SetPlayerNotify(JNIEnv *env, jobject instance,jint obj,jobject notify)
 {
 	
-	
+	PlayerStateNotifyMgr.SetPlayerNotify(obj,notify);
 }
 /***********初始一个KKUI**********/
 JNIEXPORT jint JNICALL Java_com_ic70_kkplayer_kkplayer_CJniKKPlayer_IniKK(JNIEnv *pEv, jobject p, jint Render)
@@ -293,6 +298,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM * java_vm, void * reserved)
 {
 	kk_Gjava_vm=java_vm;
 	av_jni_set_java_vm(java_vm, NULL);
+	
+	PlayerStateNotifyMgr.Start();
 	return JNI_VERSION_1_6;
 }
 /**
@@ -310,6 +317,7 @@ void* kk_jni_attach_env()
     int ret = 0;
     JNIEnv *env = NULL;
 
+	PlayerStateNotifyMgr.Stop();
     pthread_mutex_lock(&kk_Gvm_lock);
    
     JavaVM* java_vm=kk_Gjava_vm;

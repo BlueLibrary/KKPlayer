@@ -44,6 +44,10 @@ public class CKKPlayerGlRender implements GLSurfaceView.Renderer,SurfaceTexture.
             m_JniKKPlayer.OnSurfaceTextureFrameAailable(m_nKKPlayer);
         Log.i("xxxx", "onFrameAvailable");
     }
+    ///获取播放器实例
+    public int GetPlayerIns() {
+        return m_nKKPlayer;
+    }
     @Override
     public void onDrawFrame(GL10 gl)
     {
@@ -167,6 +171,26 @@ public class CKKPlayerGlRender implements GLSurfaceView.Renderer,SurfaceTexture.
         KKRealTimeOver,
         KKEOF,                //文件结束了。
         KKAVOver,            //视频结束
+    }
+    public EKKPlayerErr GetPlayerState2(int err)
+    {
+        if(err==0)
+            return EKKPlayerErr.KKOpenUrlOk;
+        else if(err==1)
+            return EKKPlayerErr.KKOpenUrlOkFailure;
+        else if(err==2)
+            return EKKPlayerErr.KKAVNotStream;
+        else if(err==3)
+            return EKKPlayerErr.KKAVReady;
+        else if(err==4)
+            return EKKPlayerErr.KKAVWait;
+        else if(err==5)
+            return EKKPlayerErr.KKRealTimeOver;
+        else if(err==6)
+            return EKKPlayerErr.KKEOF;
+        else if(err==7)
+            return EKKPlayerErr.KKAVOver;
+        return         EKKPlayerErr.KKOpenUrlOk;
     }
     public EKKPlayerErr GetPlayerState()
     {

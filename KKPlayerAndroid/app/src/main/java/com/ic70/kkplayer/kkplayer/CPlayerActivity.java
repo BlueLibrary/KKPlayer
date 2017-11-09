@@ -90,47 +90,6 @@ public class CPlayerActivity extends Activity implements IKKPlayerErrNotify {
                     lllxx=lllxx+ll+"s";
                     xxll.setText(lllxx);
                 }
-             //  Log.v("xxxxx:", m_KKPlayer.GetPlayerState() + "==="+m_OpenCouner);
-                /*********文件打开失败***********/
-                if(   m_KKPlayer.GetPlayerState()== CKKPlayerGlRender.EKKPlayerErr.KKOpenUrlOkFailure &&m_OpenCouner==0&&  PlayerStata==EnumPlayerStata.Play) {
-
-                        PlayerStata = EnumPlayerStata.OpenFailure;
-                        Button NetButton = (Button) findViewById(R.id.NetButton);
-                        NetButton.setText("文件打开失败");
-                        NetButton.setVisibility(View.VISIBLE);
-                        ImageView ImageV = (ImageView) findViewById(R.id.WaitRImageView);
-                        ImageV.setVisibility(View.GONE);
-                        ImageV.setAnimation(null);
-                        PlayerStata=EnumPlayerStata.OpenFailure;
-                }
-
-                if(m_KKPlayer.GetPlayerState() ==CKKPlayerGlRender.EKKPlayerErr.KKAVOver)
-                {
-                    Button NetButton = (Button) findViewById(R.id.NetButton);
-                    NetButton.setText("视频播放结束");
-                    NetButton.setVisibility(View.VISIBLE);
-                } else if (((llx == 0 && m_KKPlayer.GetPlayerState()== CKKPlayerGlRender.EKKPlayerErr.KKAVWait) || m_OpenCouner >= 2)|| (PlayerStata==EnumPlayerStata.Play&& m_KKPlayer.GetRealtimeDelay()>m_MinRealtimeDelay))
-                {
-                    ///需要缓冲
-                    ImageView ImageV = (ImageView) findViewById(R.id.WaitRImageView);
-                    if (ImageV.getVisibility() != View.VISIBLE)
-                         WaitGif();
-                } else if ((llx ==1 && (m_KKPlayer.GetPlayerState()==CKKPlayerGlRender.EKKPlayerErr.KKAVReady||m_KKPlayer.GetPlayerState()==CKKPlayerGlRender.EKKPlayerErr.KKOpenUrlOk))&& m_OpenCouner == 0) {
-                    ImageView ImageV = (ImageView) findViewById(R.id.WaitRImageView);
-                    ImageV.setVisibility(View.GONE);
-                    ImageV.setAnimation(null);
-
-                    Button NetButton = (Button) findViewById(R.id.NetButton);
-                    NetButton.setVisibility(View.GONE);
-                }else if (m_OpenCouner == 0&& m_KKPlayer.GetPlayerState() !=CKKPlayerGlRender.EKKPlayerErr.KKOpenUrlOk && m_KKPlayer.GetRealtimeDelay() < 5 && llx ==1)
-                {
-                    ImageView ImageV = (ImageView) findViewById(R.id.WaitRImageView);
-                    ImageV.setVisibility(View.GONE);
-                    ImageV.setAnimation(null);
-
-                    Button NetButton = (Button) findViewById(R.id.NetButton);
-                    NetButton.setVisibility(View.GONE);
-                }
 
                     //检查是否需要重连,只有流媒体才需要
                 if (m_OpenCouner == 0&& m_KKPlayer.GetRealtime()==1)
@@ -227,10 +186,41 @@ public class CPlayerActivity extends Activity implements IKKPlayerErrNotify {
         };
     };
 
-    public void OpenMediaStateNotify(String url,int err) 
+
+    ///播放器状态通知
+    public void OpenMediaStateNotify(int onj,int err)
     {
-
-
+        if(m_KKPlayer. GetPlayerState2(err) ==CKKPlayerGlRender.EKKPlayerErr.KKAVOver) {
+            Button NetButton = (Button) findViewById(R.id.NetButton);
+            NetButton.setText("视频播放结束");
+            NetButton.setVisibility(View.VISIBLE);
+        }else  if( m_KKPlayer.GetPlayerState2(err)== CKKPlayerGlRender.EKKPlayerErr.KKOpenUrlOkFailure ) {
+            PlayerStata = EnumPlayerStata.OpenFailure;
+            Button NetButton = (Button) findViewById(R.id.NetButton);
+            NetButton.setText("文件打开失败");
+            NetButton.setVisibility(View.VISIBLE);
+            ImageView ImageV = (ImageView) findViewById(R.id.WaitRImageView);
+            ImageV.setVisibility(View.GONE);
+            ImageV.setAnimation(null);
+            PlayerStata=EnumPlayerStata.OpenFailure;
+        }else if (m_KKPlayer.GetPlayerState()== CKKPlayerGlRender.EKKPlayerErr.KKAVWait) {
+            ///需要缓冲
+            ImageView ImageV = (ImageView) findViewById(R.id.WaitRImageView);
+            if (ImageV.getVisibility() != View.VISIBLE)
+                WaitGif();
+        } else if (m_KKPlayer.GetPlayerState()==CKKPlayerGlRender.EKKPlayerErr.KKAVReady) {
+            ImageView ImageV = (ImageView) findViewById(R.id.WaitRImageView);
+            ImageV.setVisibility(View.GONE);
+            ImageV.setAnimation(null);
+            Button NetButton = (Button) findViewById(R.id.NetButton);
+            NetButton.setVisibility(View.GONE);
+        }else if (m_KKPlayer.GetPlayerState() !=CKKPlayerGlRender.EKKPlayerErr.KKOpenUrlOk) {
+            ImageView ImageV = (ImageView) findViewById(R.id.WaitRImageView);
+            ImageV.setVisibility(View.GONE);
+            ImageV.setAnimation(null);
+            Button NetButton = (Button) findViewById(R.id.NetButton);
+            NetButton.setVisibility(View.GONE);
+        }
     }
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
