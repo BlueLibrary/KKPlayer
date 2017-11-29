@@ -15,6 +15,7 @@
 #endif
 int nKKH264Codec=0;
 int nKKH265Codec=0;
+
 void SetKKplayerH264HardCodec(int value)
 {
 nKKH264Codec=value;
@@ -1647,56 +1648,40 @@ LXXXX:
 					
 					if(is->Hard_Code==SKK_VideoState::HARD_CODE_DXVA)
 					     is->IRender->renderLock();
-					//视频解码
-					ret = avcodec_decode_video2(d->avctx, pFrame, &got_frame, packet);
-					if(is->Hard_Code==SKK_VideoState::HARD_CODE_DXVA)
-					    is->IRender->renderUnLock();
-					if(got_frame)  
-					{  
-							//找到pts
-							double pts = av_frame_get_best_effort_timestamp(pFrame); 
-							pFrame->sample_aspect_ratio = av_guess_sample_aspect_ratio(is->pFormatCtx, is->video_st, pFrame);
 
-							pFrame->pts =pts *av_q2d(is->video_st->time_base);
-							if(is->AVRate!=100)
-							{
-								pts=pts/((float)is->AVRate/100);
-							}
-							pts *= av_q2d(is->video_st->time_base);
-							
-
-							  AVRational  fun={frame_rate.den, frame_rate.num};
-							  is->duration = (frame_rate.num && frame_rate.den ? av_q2d(fun) : 0);
-							 /* if( pts<lastpts)
-							  {
-							       is->frame_drops_early++;
-								   av_frame_unref(pFrame);
-								   got_frame = 0;
-							  }else{
-							      lastpts=pts;
-							  }*/
-						  //    double dpts =pts;
-							 // if (get_master_sync_type(is) != AV_SYNC_VIDEO_MASTER){
-								//if (pFrame->pts != AV_NOPTS_VALUE) {
-								//	double diff = dpts - get_master_clock(is);
-								//	if (!isNAN(diff) && fabs(diff) < AV_NOSYNC_THRESHOLD &&
-								//		diff - is->frame_last_filter_delay < 0     && 
-								//		is->viddec.pkt_serial == is->vidclk.serial &&
-								//		is->videoq.nb_packets) 
-								//	{
-								//		is->frame_drops_early++;
-								//		//av_frame_unref(pFrame);
-								//		got_frame = 0;
-								//	}
-								//}
-							 // }
-						if(queue_picture(is, pFrame, pts, is->duration , av_frame_get_pkt_pos(pFrame), is->viddec.pkt_serial) < 0)  
+					ret = avcodec_send_packet(d->avctx,packet);
+					if(ret<0)
+						assert(0);
+					else{
+						//视频解码
+						//ret = avcodec_decode_video2(d->avctx, pFrame, &got_frame, packet);
+                        got_frame = avcodec_receive_frame(d->avctx, pFrame);
+						if(is->Hard_Code==SKK_VideoState::HARD_CODE_DXVA)
+							is->IRender->renderUnLock();
+						if(got_frame>=0)  
 						{  
-							//break;  
-						}  
-						av_frame_unref(pFrame);
+								//找到pts
+								double pts = av_frame_get_best_effort_timestamp(pFrame); 
+								pFrame->sample_aspect_ratio = av_guess_sample_aspect_ratio(is->pFormatCtx, is->video_st, pFrame);
+
+								pFrame->pts =pts *av_q2d(is->video_st->time_base);
+								if(is->AVRate!=100)
+								{
+									pts=pts/((float)is->AVRate/100);
+								}
+								pts *= av_q2d(is->video_st->time_base);
+								
+
+								  AVRational  fun={frame_rate.den, frame_rate.num};
+								  is->duration = (frame_rate.num && frame_rate.den ? av_q2d(fun) : 0);
+								
+							if(queue_picture(is, pFrame, pts, is->duration , av_frame_get_pkt_pos(pFrame), is->viddec.pkt_serial) < 0)  
+							{  
+								//break;  
+							}  
+							av_frame_unref(pFrame);
+						}
 					}
-					
 			}else {
 				//av_frame_unref(pFrame);
 				LOGE_KK(" video2 avcodec_flush_buffers \n");
@@ -1729,8 +1714,8 @@ LXXXX:
 			}
 			
 			lastsegid=segid;
-			av_free_packet(packet); 
-			
+			//av_free_packet(packet); 
+			av_packet_unref(packet);
 			
 	}
 
@@ -1941,18 +1926,27 @@ LOXXXX:
 
 	}else{
 		audio_pkt_size=pkt.size;
-		len1 = avcodec_decode_audio4(aCodecCtx, frame, &got_frame, &pkt);	
-		frame->pts = pkt.pts;
+		got_frame=avcodec_send_packet(aCodecCtx,&pkt);
 
-		if(got_frame>0)
-		{
-			AVRational tb =pVideoInfo->audio_st->time_base;
-			if (frame->pts != AV_NOPTS_VALUE&&!pVideoInfo->realtime)
-				frame->pts = av_rescale_q(frame->pts,tb , aCodecCtx->time_base);
-			else /*if (frame->pkt_pts != AV_NOPTS_VALUE)
-				frame->pts = av_rescale_q(frame->pkt_pts, av_codec_get_pkt_timebase(aCodecCtx), tb);
-			else*/
-				frame->pts=pkt.pts;
+		if(got_frame<0){
+		   assert(0);
+		}else{
+			got_frame=avcodec_receive_frame(aCodecCtx, frame);
+			//len1 = avcodec_decode_audio4(aCodecCtx, frame, &got_frame, &pkt);	
+			//frame->pts = pkt.pts;
+
+			if(got_frame>=0)
+			{
+				got_frame=1;
+				frame->pts = pkt.pts;
+				AVRational tb =pVideoInfo->audio_st->time_base;
+				if (frame->pts != AV_NOPTS_VALUE&&!pVideoInfo->realtime)
+					frame->pts = av_rescale_q(frame->pts,tb , aCodecCtx->time_base);
+				else /*if (frame->pkt_pts != AV_NOPTS_VALUE)
+					frame->pts = av_rescale_q(frame->pkt_pts, av_codec_get_pkt_timebase(aCodecCtx), tb);
+				else*/
+					frame->pts=pkt.pts;
+			}
 		}
 	}	
 

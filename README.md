@@ -21,8 +21,18 @@ KKSoui2Path=D:\work\Projects\soui<br/>
  libmfx(inter QSV编码)->zlibstat->png->skia->sdl->render->kkplayercore->kkui->jsoncpp->kkplayer<br/>
 rtmpt延迟格式控制请使用以下格式librtmp:rtmp:xxxxxxxxxxxxxxxxxxxxxx<br/>
 
-		
-
+需要在avcodec.h添加以下两个函数声明：
+int av_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt);<br/>
+int av_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags);<br/>
+在utils.c里实现<br/>
+int av_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt) <br/>
+{
+	return ff_get_format(avctx, fmt);<br/>
+}<br/>
+int av_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)<br/>
+{
+	return ff_get_buffer(avctx, frame, flags);<br/>
+}<br/>
 ffmpeg3.0 以上版本Android编译<br/>
 如果直接按照未修改的配置进行编译，结果编译出来的so文件类似libavcodec.so.55.39.101，版本号位于so之后，Android上似乎无法加载。<br/>
 因此需要按如下修改：<br/>
@@ -72,7 +82,7 @@ build_one<br/>
 
 
 windowVc(Vs2010)编译ffmpeg(https://ffmpeg.org/platform.html#Microsoft-Visual-C_002b_002b-or-Intel-C_002b_002b-Compiler-for-Windows) <br/>
-./configure的3580行修改为：<br/>
+3.3:./configure的3580行修改为：<br/>
         if [ -z "$cl_major_ver" ] || [ $cl_major_ver -ge 18 ]; then <br/>
             cc_default="cl"<br/>
         else<br/>
@@ -80,7 +90,20 @@ windowVc(Vs2010)编译ffmpeg(https://ffmpeg.org/platform.html#Microsoft-Visual-C
         fi<br/>
 		cc_default="c99wrap cl"<br/>
 例如(启用共享库，关闭所有编码器):<br/>
-./configure --toolchain=msvc --extra-cflags='-IC:/msinttypes' --prefix='./ffmpegBin'   --incdir='./ffmpegBin/incdir' --enable-shared --disable-encoders<br/>
+3.4:./configure的3774行修改为：<br/>
+        cl_major_ver=$(cl 2>&1 | sed -n 's/.*Version \([[:digit:]]\{1,\}\)\..*/\1/p') <br/>
+        if [ -z "$cl_major_ver" ] || [ $cl_major_ver -ge 18 ]; then <br/>
+            cc_default="cl"<br/>
+            cxx_default="cl"<br/>
+        else<br/>
+            cc_default="c99wrap cl"<br/>
+            cxx_default="c99wrap cl"<br/>
+        fi<br/>
+		cc_default="c99wrap cl"<br/>
+        cxx_default="c99wrap cl"<br/>
+
+./configure --toolchain=msvc --extra-cflags='-IC:/msinttypes' --prefix='./ffmpegBin'   --incdir='./ffmpegBin/incdir' --enable-shared --disable-encoders --disable-ffplay --disable-ffprobe --disable-ffserver 
+<br/>
 更新日志：<br/>
 2017-5-23	<br>
 &nbsp;&nbsp;&nbsp;&nbsp; 移除srslibrtmpplugin. 添加librtmpplugin<br/>
@@ -96,3 +119,9 @@ windowVc(Vs2010)编译ffmpeg(https://ffmpeg.org/platform.html#Microsoft-Visual-C
 &nbsp;&nbsp;&nbsp;&nbsp; windows libkkplayer库,回调数据做修改，添加新的接口<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d3d9 4k渲染优化，修正qsv 解码265 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp; android 添加更多的接口<br/>
+2017-10-20  <br/>
+&nbsp;&nbsp;&nbsp;&nbsp; win界面修正,小小bug修复。
+2017-11-29 <br/>
+&nbsp;&nbsp;&nbsp;&nbsp; 音视频解码使用新版FFmpeg接口。<br/>
+&nbsp;&nbsp;&nbsp;&nbsp; FFmpeg库更新到3.4。<br/>
+&nbsp;&nbsp;&nbsp;&nbsp; Kkplayer1.1.0分支建立。<br/>
