@@ -165,9 +165,9 @@ AVCodec kk_hevc_qsv_decoder = {
 	 0,
 	 qsv_decode_frame,
 	 qsv_decode_close,
-	 0,0,0,0,
+	 0,0,0,
      qsv_decode_flush,
-	 0
+	 0,"hevc_mp4toannexb"
 };
 void Registerkk_h265_qsv_decoder()
 {
@@ -186,8 +186,8 @@ static const AVClass _class = {"kk_h264_qsv",av_default_item_name,NULL,LIBAVUTIL
 AVCodec kk_h264_qsv_decoder = { "kk_h264_qsv","H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10 (Intel Quick Sync Video acceleration)",
      AVMEDIA_TYPE_VIDEO,AV_CODEC_ID_H264,AV_CODEC_CAP_DELAY | AV_CODEC_CAP_DR1,0,pix_fmts,
 	 0,0,0,0,&_class,0,sizeof(KKQSVH2645Context),0,0,0,0,0,
-     qsv_decode_init,0,0,qsv_decode_frame,qsv_decode_close,0,0,0,0,
-     qsv_decode_flush,0};
+     qsv_decode_init,0,0,qsv_decode_frame,qsv_decode_close,0,0,0,
+     qsv_decode_flush,0,"hevc_mp4toannexb"};
 
 void Registerkk_h264_qsv_decoder()
 {

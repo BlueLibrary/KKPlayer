@@ -102,7 +102,7 @@ windowVc(Vs2010)编译ffmpeg(https://ffmpeg.org/platform.html#Microsoft-Visual-C
 		cc_default="c99wrap cl"<br/>
         cxx_default="c99wrap cl"<br/>
 
-./configure --toolchain=msvc --extra-cflags='-IC:/msinttypes' --prefix='./ffmpegBin'   --incdir='./ffmpegBin/incdir' --enable-shared --disable-encoders --disable-ffplay --disable-ffprobe --disable-ffserver 
+./configure --toolchain=msvc --extra-cflags='-IC:/msinttypes' --prefix='./ffmpegBin'   --incdir='./ffmpegBin/incdir' --enable-shared --disable-ffplay --disable-ffprobe --disable-ffserver 
 <br/>
 更新日志：<br/>
 2017-5-23	<br>
@@ -120,7 +120,7 @@ windowVc(Vs2010)编译ffmpeg(https://ffmpeg.org/platform.html#Microsoft-Visual-C
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d3d9 4k渲染优化，修正qsv 解码265 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp; android 添加更多的接口<br/>
 2017-10-20  <br/>
-&nbsp;&nbsp;&nbsp;&nbsp; win界面修正,小小bug修复。
+&nbsp;&nbsp;&nbsp;&nbsp; win界面修正,小小bug修复。<br/>
 2017-11-29 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp; 音视频解码使用新版FFmpeg接口。<br/>
 &nbsp;&nbsp;&nbsp;&nbsp; FFmpeg库更新到3.4。<br/>
