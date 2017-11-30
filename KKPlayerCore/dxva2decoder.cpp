@@ -881,8 +881,9 @@ static void ffmpeg_ReleaseFrameBuf( void *p1,uint8_t *p2 )
 			break;
 		}
 	}
-	
+	if(pSurface!=0)
 	SafeRelease(&pSurface);
+	if(sw->pDXDecoder!=0)
 	SafeRelease(&sw->pDXDecoder);
 	delete sw;
 

@@ -1646,19 +1646,24 @@ LXXXX:
 			if (packet->data != is->pflush_pkt->data) //&&is->videoq.serial==is->viddec.pkt_serial
 			{
 					
+				///新版api导致现有dxva2 解码锁不住了，需要单独实现，现在暂时撤回
 					if(is->Hard_Code==SKK_VideoState::HARD_CODE_DXVA)
 					     is->IRender->renderLock();
 
-					ret = avcodec_send_packet(d->avctx,packet);
-					if(ret<0)
-						assert(0);
-					else{
+					//ret = avcodec_send_packet(d->avctx,packet);
+					//if(ret<0){
+					//	//assert(0);
+					//	if(is->Hard_Code==SKK_VideoState::HARD_CODE_DXVA)
+					//		is->IRender->renderUnLock();
+					//}
+					//else
+					{
 						//视频解码
-						//ret = avcodec_decode_video2(d->avctx, pFrame, &got_frame, packet);
-                        got_frame = avcodec_receive_frame(d->avctx, pFrame);
+						ret = avcodec_decode_video2(d->avctx, pFrame, &got_frame, packet);
+                        //got_frame = avcodec_receive_frame(d->avctx, pFrame);
 						if(is->Hard_Code==SKK_VideoState::HARD_CODE_DXVA)
 							is->IRender->renderUnLock();
-						if(got_frame>=0)  
+						if(got_frame)  
 						{  
 								//找到pts
 								double pts = av_frame_get_best_effort_timestamp(pFrame); 
@@ -1678,8 +1683,12 @@ LXXXX:
 							if(queue_picture(is, pFrame, pts, is->duration , av_frame_get_pkt_pos(pFrame), is->viddec.pkt_serial) < 0)  
 							{  
 								//break;  
-							}  
+							} 
+							if(is->Hard_Code==SKK_VideoState::HARD_CODE_DXVA)
+							is->IRender->renderLock();
 							av_frame_unref(pFrame);
+							if(is->Hard_Code==SKK_VideoState::HARD_CODE_DXVA)
+							is->IRender->renderUnLock();
 						}
 					}
 			}else {
