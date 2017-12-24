@@ -1939,7 +1939,7 @@ LOXXXX:
 
 		if(got_frame<0){
 		   assert(0);
-		}else{
+		}else{/**/
 			got_frame=avcodec_receive_frame(aCodecCtx, frame);
 			//len1 = avcodec_decode_audio4(aCodecCtx, frame, &got_frame, &pkt);	
 			//frame->pts = pkt.pts;
